@@ -1,4 +1,38 @@
+# Dependencies
 node_modules/
-.DS_Store
-*.log
+
+# Environment variables (contains secrets like API keys, passwords)
 .env
+.env.local
+.env.*.local
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System files
+.DS_Store      # Mac
+Thumbs.db      # Windows
+*.swp          # Linux/Vim temporary files
+
+# IDE/Editor folders
+.vscode/       # VS Code settings (optional - some people commit this)
+.idea/         # JetBrains IDEs
+*.sublime-*    # Sublime Text
+
+# Build outputs (if you add build steps later)
+dist/
+build/
+
+# Testing coverage reports
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Claude extension (keep this local to your machine)
+.claude/
