@@ -36,3 +36,4 @@ coverage/
 
 # Claude extension (keep this local to your machine)
 .claude/
+twinkl-handwriting-font/
