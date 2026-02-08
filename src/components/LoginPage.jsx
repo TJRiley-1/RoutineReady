@@ -1,6 +1,14 @@
+import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function LoginPage() {
+  const [mode, setMode] = useState('login') // 'login' | 'signup'
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -9,18 +17,70 @@ export default function LoginPage() {
       },
     })
     if (error) {
-      alert('Login failed: ' + error.message)
+      setMessage({ type: 'error', text: error.message })
     }
+  }
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      setMessage({ type: 'error', text: error.message })
+    }
+    setLoading(false)
+  }
+
+  const handleEmailSignup = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+
+    if (password !== confirmPassword) {
+      setMessage({ type: 'error', text: 'Passwords do not match.' })
+      setLoading(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setMessage({ type: 'error', text: 'Password must be at least 6 characters.' })
+      setLoading(false)
+      return
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    })
+
+    if (error) {
+      setMessage({ type: 'error', text: error.message })
+    } else {
+      setMessage({ type: 'success', text: 'Check your email for a confirmation link.' })
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+    }
+    setLoading(false)
   }
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">RoutineReady</h1>
-        <p className="text-gray-500 text-sm mb-6">Visual routine display for classrooms</p>
-        <p className="text-gray-600 mb-8">
-          Sign in to manage your classroom routines from any device.
-        </p>
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">RoutineReady</h1>
+          <p className="text-gray-500 text-sm">Visual routine display for classrooms</p>
+        </div>
+
         <button
           onClick={handleGoogleLogin}
           className="w-full px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center gap-3 transition-colors"
@@ -33,6 +93,75 @@ export default function LoginPage() {
           </svg>
           Sign in with Google
         </button>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-gray-200"></div>
+          <span className="text-gray-400 text-sm">or</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
+        </div>
+
+        <form onSubmit={mode === 'login' ? handleEmailLogin : handleEmailSignup}>
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors"
+            />
+            {mode === 'signup' && (
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors"
+              />
+            )}
+          </div>
+
+          {message && (
+            <div className={`mt-4 p-3 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+              {message.text}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-4 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          >
+            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {mode === 'login' ? (
+            <>
+              Don't have an account?{' '}
+              <button onClick={() => { setMode('signup'); setMessage(null) }} className="text-indigo-600 font-semibold hover:underline">
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <button onClick={() => { setMode('login'); setMessage(null) }} className="text-indigo-600 font-semibold hover:underline">
+                Sign in
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </div>
   )
