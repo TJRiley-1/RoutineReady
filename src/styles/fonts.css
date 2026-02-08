@@ -1,0 +1,110 @@
+/* Twinkl Cursive Looped Fonts */
+@font-face {
+  font-family: 'Twinkl Cursive Looped';
+  src: url('/fonts/TwinklCursiveLooped-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Looped';
+  src: url('/fonts/TwinklCursiveLooped-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Looped';
+  src: url('/fonts/TwinklCursiveLooped-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Looped';
+  src: url('/fonts/TwinklCursiveLooped-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Looped';
+  src: url('/fonts/TwinklCursiveLooped-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Twinkl Cursive Unlooped Fonts */
+@font-face {
+  font-family: 'Twinkl Cursive Unlooped';
+  src: url('/fonts/TwinklCursiveUnlooped-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Unlooped';
+  src: url('/fonts/TwinklCursiveUnlooped-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Unlooped';
+  src: url('/fonts/TwinklCursiveUnlooped-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Unlooped';
+  src: url('/fonts/TwinklCursiveUnlooped-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Cursive Unlooped';
+  src: url('/fonts/TwinklCursiveUnlooped-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Twinkl Precursive Fonts */
+@font-face {
+  font-family: 'Twinkl Precursive';
+  src: url('/fonts/TwinklPrecursive-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Precursive';
+  src: url('/fonts/TwinklPrecursive-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Precursive';
+  src: url('/fonts/TwinklPrecursive-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Precursive';
+  src: url('/fonts/TwinklPrecursive-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Twinkl Precursive';
+  src: url('/fonts/TwinklPrecursive-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

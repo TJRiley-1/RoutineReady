@@ -1,0 +1,161 @@
+import { X, Check, Edit, Trash2, Plus } from 'lucide-react'
+import { presetThemes } from '../../data/presetThemes'
+
+export default function ThemeSelectorModal({
+  currentTheme,
+  customThemes,
+  setCurrentTheme,
+  setCustomThemes,
+  onCreateCustom,
+  onEditCustom,
+  onClose,
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8">
+      <div className="bg-white rounded-lg p-8 w-full max-w-5xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">Choose a Theme</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X className="w-8 h-8" />
+          </button>
+        </div>
+
+        <h3 className="text-xl font-semibold text-gray-700 mb-4">Preset Themes</h3>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {Object.values(presetThemes).map((theme) => (
+            <div
+              key={theme.id}
+              onClick={() => {
+                setCurrentTheme(theme.id)
+                onClose()
+              }}
+              className={`relative cursor-pointer border-4 rounded-lg p-4 transition-all hover:shadow-xl ${
+                currentTheme === theme.id ? 'border-indigo-600' : 'border-gray-300'
+              }`}
+            >
+              {currentTheme === theme.id && (
+                <div className="absolute top-2 right-2 bg-indigo-600 text-white rounded-full p-1">
+                  <Check className="w-5 h-5" />
+                </div>
+              )}
+              <div className="text-4xl mb-2 text-center">{theme.emoji}</div>
+              <div className="text-lg font-bold text-center mb-3">{theme.name}</div>
+              <div
+                className="h-20 rounded-lg mb-3"
+                style={{
+                  background: theme.bgGradientVia
+                    ? `linear-gradient(to right, ${theme.bgGradientFrom}, ${theme.bgGradientVia}, ${theme.bgGradientTo})`
+                    : `linear-gradient(to right, ${theme.bgGradientFrom}, ${theme.bgGradientTo})`,
+                }}
+              ></div>
+              <div
+                className={`${theme.cardRounded} p-3 text-center text-sm font-semibold`}
+                style={{
+                  backgroundColor: theme.cardBgColor,
+                  border: `${theme.cardBorderWidth} solid ${theme.cardBorderColor}`,
+                  fontWeight: theme.fontWeight,
+                  textTransform: theme.fontTransform,
+                }}
+              >
+                Sample Task
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {customThemes.length > 0 && (
+          <>
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Custom Themes</h3>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              {customThemes.map((theme) => (
+                <div
+                  key={theme.id}
+                  className={`relative border-4 rounded-lg p-4 transition-all ${
+                    currentTheme === theme.id ? 'border-indigo-600' : 'border-gray-300'
+                  }`}
+                >
+                  {currentTheme === theme.id && (
+                    <div className="absolute top-2 right-2 bg-indigo-600 text-white rounded-full p-1">
+                      <Check className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="text-4xl">{theme.emoji}</div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEditCustom(theme)
+                        }}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded cursor-pointer"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (confirm(`Delete "${theme.name}"?`)) {
+                            setCustomThemes(customThemes.filter((t) => t.id !== theme.id))
+                            if (currentTheme === theme.id) {
+                              setCurrentTheme('ocean-calm')
+                            }
+                          }
+                        }}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded cursor-pointer"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => {
+                      setCurrentTheme(theme.id)
+                      onClose()
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <div className="text-lg font-bold text-center mb-3">
+                      {theme.name}
+                      <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                        custom
+                      </span>
+                    </div>
+                    <div
+                      className="h-20 rounded-lg mb-3"
+                      style={{
+                        background: theme.bgGradientVia
+                          ? `linear-gradient(to right, ${theme.bgGradientFrom}, ${theme.bgGradientVia}, ${theme.bgGradientTo})`
+                          : `linear-gradient(to right, ${theme.bgGradientFrom}, ${theme.bgGradientTo})`,
+                      }}
+                    ></div>
+                    <div
+                      className={`${theme.cardRounded} p-3 text-center text-sm font-semibold`}
+                      style={{
+                        backgroundColor: theme.cardBgColor,
+                        border: `${theme.cardBorderWidth} solid ${theme.cardBorderColor}`,
+                        fontWeight: theme.fontWeight,
+                        textTransform: theme.fontTransform,
+                      }}
+                    >
+                      Sample Task
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <button
+          onClick={onCreateCustom}
+          className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 font-bold text-lg"
+        >
+          <Plus className="w-6 h-6 inline mr-2" />
+          Create Custom Theme
+        </button>
+      </div>
+    </div>
+  )
+}

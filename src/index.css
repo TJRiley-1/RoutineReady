@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@import "./styles/fonts.css";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+button, a, label {
+  cursor: pointer;
+}
