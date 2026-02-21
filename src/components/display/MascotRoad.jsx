@@ -1,4 +1,4 @@
-import { getProgressPercentage } from '../lib/timeUtils'
+import { getProgressPercentage } from '../../lib/timeUtils'
 
 export default function MascotRoad({ taskDuration, elapsed, isPast, isActive, mascotImg, roadWidth }) {
   const progressPercentage = getProgressPercentage(isPast, isActive, elapsed, taskDuration)

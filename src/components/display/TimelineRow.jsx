@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import { Clock } from 'lucide-react'
-import { getIconComponent } from '../data/iconLibrary'
-import { getFontStyle } from '../lib/themeUtils'
-import { calculateEndTime } from '../lib/timeUtils'
+import { getIconComponent } from '../../data/iconLibrary'
+import { getFontStyle } from '../../lib/themeUtils'
+import { calculateEndTime } from '../../lib/timeUtils'
 import TransitionIndicator from './TransitionIndicator'
 
 export default function TimelineRow({
@@ -86,8 +86,9 @@ export default function TimelineRow({
                 <>
                   {IconComponent && (
                     <IconComponent
-                      className="text-indigo-600 mb-2"
+                      className="mb-2"
                       style={{
+                        color: theme.cardBorderColor,
                         width: `${Math.min(taskWidth * 0.4, 64)}px`,
                         height: `${Math.min(taskWidth * 0.4, 64)}px`,
                       }}

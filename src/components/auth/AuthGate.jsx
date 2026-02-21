@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import LoginPage from './LoginPage'
 
 export default function AuthGate({ children }) {
@@ -24,7 +24,8 @@ export default function AuthGate({ children }) {
 
   if (loading) {
     return (
-      <div className="w-full h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+      <div className="w-full h-screen bg-gradient-to-br from-brand-primary to-brand-primary-dark flex flex-col items-center justify-center gap-4">
+        <img src="/logos/RoutineReady_Logo_Horizontal_White.svg" alt="Routine Ready" className="h-12" />
         <div className="text-white text-xl font-semibold">Loading...</div>
       </div>
     )

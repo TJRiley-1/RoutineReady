@@ -29,12 +29,12 @@ export default function ThemeEditorModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-7xl h-[95vh] shadow-2xl flex flex-col">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="theme-editor-title">
+      <div className="bg-white rounded-[16px] w-full max-w-7xl h-[95vh] shadow-lg flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-3xl font-bold text-gray-800">Custom Theme Editor</h2>
-          <button onClick={onBackToSelector} className="text-gray-500 hover:text-gray-700">
+        <div className="flex justify-between items-center p-6 border-b border-brand-border">
+          <h2 id="theme-editor-title" className="text-3xl font-bold text-brand-text">Custom Theme Editor</h2>
+          <button onClick={onBackToSelector} className="text-brand-text-muted hover:text-brand-text" aria-label="Close theme editor">
             <X className="w-8 h-8" />
           </button>
         </div>
@@ -42,41 +42,44 @@ export default function ThemeEditorModal({
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Controls */}
-          <div className="w-1/2 overflow-y-auto p-6 border-r">
+          <div className="w-1/2 overflow-y-auto p-6 border-r border-brand-border">
             {/* Theme Name */}
             <div className="mb-6">
-              <label className="block text-sm font-bold text-gray-700 mb-2">Theme Name</label>
+              <label htmlFor="theme-name" className="block text-sm font-bold text-brand-text mb-2">Theme Name</label>
               <input
+                id="theme-name"
                 type="text"
                 value={editingTheme.name}
                 onChange={(e) => setEditingTheme({ ...editingTheme, name: e.target.value })}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-indigo-500 focus:outline-none"
+                className="w-full p-3 h-[44px] border-2 border-brand-border rounded-[6px] text-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"
                 placeholder="My Custom Theme"
               />
             </div>
 
             {/* Theme Emoji */}
             <div className="mb-6">
-              <label className="block text-sm font-bold text-gray-700 mb-2">Theme Emoji</label>
+              <label htmlFor="theme-emoji" className="block text-sm font-bold text-brand-text mb-2">Theme Emoji</label>
               <input
+                id="theme-emoji"
                 type="text"
                 value={editingTheme.emoji}
                 onChange={(e) => setEditingTheme({ ...editingTheme, emoji: e.target.value })}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg text-4xl text-center focus:border-indigo-500 focus:outline-none"
+                className="w-full p-3 border-2 border-brand-border rounded-[6px] text-4xl text-center focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"
                 placeholder="🎨"
                 inputMode="text"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-brand-text-muted mt-1">
                 Click to select or paste an emoji (Windows: Win+. | Mac: Cmd+Ctrl+Space)
               </p>
             </div>
 
             {/* Base Theme Template */}
             <div className="mb-6">
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label htmlFor="theme-preset" className="block text-sm font-bold text-brand-text mb-2">
                 Start from Preset
               </label>
               <select
+                id="theme-preset"
                 onChange={(e) => {
                   const baseTheme = presetThemes[e.target.value]
                   if (baseTheme) {
@@ -88,7 +91,7 @@ export default function ThemeEditorModal({
                     })
                   }
                 }}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none"
+                className="w-full p-3 h-[44px] border-2 border-brand-border rounded-[6px] focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"
               >
                 <option value="">Choose a preset to copy...</option>
                 {Object.values(presetThemes).map((theme) => (
@@ -99,14 +102,14 @@ export default function ThemeEditorModal({
               </select>
             </div>
 
-            <hr className="my-6" />
+            <hr className="my-6 border-brand-border" />
 
             {/* Background Gradient */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Background Gradient</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Background Gradient</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-brand-text mb-2">
                     Start Color
                   </label>
                   <input
@@ -115,18 +118,18 @@ export default function ThemeEditorModal({
                     onChange={(e) =>
                       setEditingTheme({ ...editingTheme, bgGradientFrom: e.target.value })
                     }
-                    className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                    className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">End Color</label>
+                  <label className="block text-sm font-medium text-brand-text mb-2">End Color</label>
                   <input
                     type="color"
                     value={editingTheme.bgGradientTo}
                     onChange={(e) =>
                       setEditingTheme({ ...editingTheme, bgGradientTo: e.target.value })
                     }
-                    className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                    className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                   />
                 </div>
               </div>
@@ -134,18 +137,19 @@ export default function ThemeEditorModal({
 
             {/* Task Card Styling */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Task Card Design</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Task Card Design</h3>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="card-corners" className="block text-sm font-medium text-brand-text mb-2">
                   Corner Style
                 </label>
                 <select
+                  id="card-corners"
                   value={editingTheme.cardRounded}
                   onChange={(e) =>
                     setEditingTheme({ ...editingTheme, cardRounded: e.target.value })
                   }
-                  className="w-full p-2 border-2 border-gray-300 rounded-lg"
+                  className="w-full p-2 h-[44px] border-2 border-brand-border rounded-[6px]"
                 >
                   <option value="rounded-3xl">Extra Rounded</option>
                   <option value="rounded-2xl">Very Rounded</option>
@@ -157,7 +161,7 @@ export default function ThemeEditorModal({
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Border Color
                 </label>
                 <input
@@ -166,12 +170,12 @@ export default function ThemeEditorModal({
                   onChange={(e) =>
                     setEditingTheme({ ...editingTheme, cardBorderColor: e.target.value })
                   }
-                  className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Border Width: {editingTheme.cardBorderWidth}
                 </label>
                 <input
@@ -188,7 +192,7 @@ export default function ThemeEditorModal({
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Card Background
                 </label>
                 <input
@@ -197,14 +201,14 @@ export default function ThemeEditorModal({
                   onChange={(e) =>
                     setEditingTheme({ ...editingTheme, cardBgColor: e.target.value })
                   }
-                  className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Font Style */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Font Style</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Font Style</h3>
               <select
                 value={`${editingTheme.fontWeight}-${editingTheme.fontTransform}-${editingTheme.fontFamily || 'sans-serif'}`}
                 onChange={(e) => {
@@ -219,7 +223,7 @@ export default function ThemeEditorModal({
                     fontFamily: family,
                   })
                 }}
-                className="w-full p-2 border-2 border-gray-300 rounded-lg"
+                className="w-full p-2 h-[44px] border-2 border-brand-border rounded-[6px]"
               >
                 <option value="300-none-sans-serif">Light</option>
                 <option value="400-none-sans-serif">Regular</option>
@@ -249,22 +253,22 @@ export default function ThemeEditorModal({
 
             {/* Current Task Highlight */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Current Task Highlight</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Current Task Highlight</h3>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Glow Color</label>
+                <label className="block text-sm font-medium text-brand-text mb-2">Glow Color</label>
                 <input
                   type="color"
                   value={editingTheme.currentGlowColor}
                   onChange={(e) =>
                     setEditingTheme({ ...editingTheme, currentGlowColor: e.target.value })
                   }
-                  className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Background Overlay
                 </label>
                 <input
@@ -279,7 +283,7 @@ export default function ThemeEditorModal({
                       currentBgOverlay: `rgba(${parseInt(e.target.value.slice(1, 3), 16)}, ${parseInt(e.target.value.slice(3, 5), 16)}, ${parseInt(e.target.value.slice(5, 7), 16)}, ${opacity})`,
                     })
                   }}
-                  className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                 />
               </div>
 
@@ -296,7 +300,7 @@ export default function ThemeEditorModal({
                     }
                     className="mr-2 w-5 h-5"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-brand-text">
                     Enhance Border on Current Task
                   </span>
                 </label>
@@ -305,21 +309,21 @@ export default function ThemeEditorModal({
 
             {/* Progress Line Colors */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Time Progress Colors</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Time Progress Colors</h3>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Past/Done</label>
+                  <label className="block text-xs font-medium text-brand-text mb-2">Past/Done</label>
                   <input
                     type="color"
                     value={editingTheme.tickPastColor}
                     onChange={(e) =>
                       setEditingTheme({ ...editingTheme, tickPastColor: e.target.value })
                     }
-                    className="w-full h-10 rounded border-2 border-gray-300 cursor-pointer"
+                    className="w-full h-10 rounded-[6px] border-2 border-brand-border cursor-pointer"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-brand-text mb-2">
                     Current/Active
                   </label>
                   <input
@@ -328,11 +332,11 @@ export default function ThemeEditorModal({
                     onChange={(e) =>
                       setEditingTheme({ ...editingTheme, tickCurrentColor: e.target.value })
                     }
-                    className="w-full h-10 rounded border-2 border-gray-300 cursor-pointer"
+                    className="w-full h-10 rounded-[6px] border-2 border-brand-border cursor-pointer"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-brand-text mb-2">
                     Future/Next
                   </label>
                   <input
@@ -341,7 +345,7 @@ export default function ThemeEditorModal({
                     onChange={(e) =>
                       setEditingTheme({ ...editingTheme, tickFutureColor: e.target.value })
                     }
-                    className="w-full h-10 rounded border-2 border-gray-300 cursor-pointer"
+                    className="w-full h-10 rounded-[6px] border-2 border-brand-border cursor-pointer"
                   />
                 </div>
               </div>
@@ -349,9 +353,9 @@ export default function ThemeEditorModal({
 
             {/* Time Card Accent */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Time Card Accents</h3>
+              <h3 className="text-lg font-bold text-brand-text mb-3">Time Card Accents</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Accent Color
                 </label>
                 <input
@@ -360,21 +364,21 @@ export default function ThemeEditorModal({
                   onChange={(e) =>
                     setEditingTheme({ ...editingTheme, timeCardAccentColor: e.target.value })
                   }
-                  className="w-full h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  className="w-full h-12 rounded-[6px] border-2 border-brand-border cursor-pointer"
                 />
               </div>
             </div>
           </div>
 
           {/* Right Panel - Live Preview */}
-          <div className="w-1/2 overflow-y-auto p-6 bg-gray-50">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Live Preview</h3>
+          <div className="w-1/2 overflow-y-auto p-6 bg-brand-bg-subtle">
+            <h3 className="text-2xl font-bold text-brand-text mb-4">Live Preview</h3>
 
             {/* Background Preview */}
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-2">Background</p>
+              <p className="text-sm font-medium text-brand-text mb-2">Background</p>
               <div
-                className="w-full h-32 rounded-lg shadow-inner"
+                className="w-full h-32 rounded-[6px] shadow-inner"
                 style={{
                   background: editingTheme.bgGradientVia
                     ? `linear-gradient(to right, ${editingTheme.bgGradientFrom}, ${editingTheme.bgGradientVia}, ${editingTheme.bgGradientTo})`
@@ -385,10 +389,10 @@ export default function ThemeEditorModal({
 
             {/* Task Card Previews */}
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-2">Task Cards</p>
+              <p className="text-sm font-medium text-brand-text mb-2">Task Cards</p>
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs text-gray-600 mb-2">Regular Task:</p>
+                  <p className="text-xs text-brand-text-muted mb-2">Regular Task:</p>
                   <div
                     className={`${editingTheme.cardRounded} p-4 shadow-lg`}
                     style={{
@@ -407,7 +411,7 @@ export default function ThemeEditorModal({
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-600 mb-2">Current Task (Active):</p>
+                  <p className="text-xs text-brand-text-muted mb-2">Current Task (Active):</p>
                   <div
                     className={`${editingTheme.cardRounded} p-4 shadow-2xl transform scale-105`}
                     style={{
@@ -432,7 +436,7 @@ export default function ThemeEditorModal({
 
             {/* Progress Line Preview */}
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-2">Progress Indicator</p>
+              <p className="text-sm font-medium text-brand-text mb-2">Progress Indicator</p>
               <div className="flex items-center gap-2">
                 <div
                   className="w-8 h-8 rounded-full"
@@ -446,13 +450,13 @@ export default function ThemeEditorModal({
                   className="w-8 h-8 rounded-full"
                   style={{ backgroundColor: editingTheme.tickFutureColor }}
                 ></div>
-                <span className="text-xs text-gray-600 ml-2">Past → Current → Future</span>
+                <span className="text-xs text-brand-text-muted ml-2">Past → Current → Future</span>
               </div>
             </div>
 
             {/* Time Cards Preview */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Time Cards</p>
+              <p className="text-sm font-medium text-brand-text mb-2">Time Cards</p>
               <div className="flex gap-4">
                 <div
                   className="flex-1 rounded-xl shadow-lg p-4 bg-white"
@@ -464,7 +468,7 @@ export default function ThemeEditorModal({
                   >
                     09:00
                   </div>
-                  <div className="text-xs text-gray-600 text-center mt-1">Start</div>
+                  <div className="text-xs text-brand-text-muted text-center mt-1">Start</div>
                 </div>
                 <div
                   className="flex-1 rounded-xl shadow-lg p-4 bg-white"
@@ -476,7 +480,7 @@ export default function ThemeEditorModal({
                   >
                     15:00
                   </div>
-                  <div className="text-xs text-gray-600 text-center mt-1">End</div>
+                  <div className="text-xs text-brand-text-muted text-center mt-1">End</div>
                 </div>
               </div>
             </div>
@@ -484,16 +488,16 @@ export default function ThemeEditorModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-gray-50">
+        <div className="flex justify-between items-center p-6 border-t border-brand-border bg-brand-bg-subtle rounded-b-[16px]">
           <button
             onClick={onBackToSelector}
-            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
+            className="px-6 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 font-bold text-lg"
+            className="px-8 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-bold text-lg"
           >
             Save & Apply Theme
           </button>

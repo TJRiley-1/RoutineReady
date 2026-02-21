@@ -8,29 +8,29 @@ export default function SetupInfoModal({
   onClose,
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-96 shadow-2xl">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Setup Information</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="setup-info-title">
+      <div className="bg-white rounded-[16px] p-8 w-96 shadow-lg">
+        <h2 id="setup-info-title" className="text-2xl font-bold mb-6 text-brand-text">Setup Information</h2>
 
         {setupData.setupComplete && (
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-brand-bg-subtle rounded-[6px]">
             <div className="space-y-2 text-sm">
               <p>
-                <span className="font-medium text-gray-700">School:</span>{' '}
-                <span className="text-gray-600">{setupData.schoolName}</span>
+                <span className="font-medium text-brand-text">School:</span>{' '}
+                <span className="text-brand-text-muted">{setupData.schoolName}</span>
               </p>
               <p>
-                <span className="font-medium text-gray-700">Class:</span>{' '}
-                <span className="text-gray-600">{setupData.className}</span>
+                <span className="font-medium text-brand-text">Class:</span>{' '}
+                <span className="text-brand-text-muted">{setupData.className}</span>
               </p>
               <p>
-                <span className="font-medium text-gray-700">Teacher:</span>{' '}
-                <span className="text-gray-600">{setupData.teacherName}</span>
+                <span className="font-medium text-brand-text">Teacher:</span>{' '}
+                <span className="text-brand-text-muted">{setupData.teacherName}</span>
               </p>
               {setupData.deviceName && (
                 <p>
-                  <span className="font-medium text-gray-700">Device:</span>{' '}
-                  <span className="text-gray-600">{setupData.deviceName}</span>
+                  <span className="font-medium text-brand-text">Device:</span>{' '}
+                  <span className="text-brand-text-muted">{setupData.deviceName}</span>
                 </p>
               )}
             </div>
@@ -40,13 +40,13 @@ export default function SetupInfoModal({
         <div className="space-y-3">
           <button
             onClick={onEditSetup}
-            className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+            className="w-full flex items-center justify-center gap-2 bg-brand-primary text-white min-h-[44px] py-3 rounded-[6px] hover:bg-brand-primary-dark transition-colors font-semibold"
           >
             <Edit className="w-5 h-5" />
             Edit Setup Info
           </button>
 
-          <label className="w-full flex items-center justify-center gap-2 bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors font-semibold cursor-pointer">
+          <label className="w-full flex items-center justify-center gap-2 bg-brand-accent text-brand-primary-dark min-h-[44px] py-3 rounded-[6px] hover:bg-brand-accent-light transition-colors font-semibold cursor-pointer">
             <Upload className="w-5 h-5" />
             Restore from Backup
             <input
@@ -59,14 +59,14 @@ export default function SetupInfoModal({
 
           <button
             onClick={onResetSetup}
-            className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-semibold"
+            className="w-full flex items-center justify-center gap-2 bg-brand-error text-white min-h-[44px] py-3 rounded-[6px] hover:bg-red-600 transition-colors font-semibold"
           >
             <RefreshCw className="w-5 h-5" />
             Reset to Default
           </button>
           <button
             onClick={onClose}
-            className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+            className="w-full bg-brand-bg-subtle text-brand-text border border-brand-border min-h-[44px] py-3 rounded-[6px] hover:bg-gray-200 transition-colors font-semibold"
           >
             Cancel
           </button>

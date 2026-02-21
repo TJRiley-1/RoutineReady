@@ -1,17 +1,17 @@
 import { Fragment, useState, useRef } from 'react'
 import { LogOut, Plus, Clock, Edit2, Trash2 } from 'lucide-react'
-import { getIconComponent } from '../data/iconLibrary'
-import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../lib/themeUtils'
-import { calculateEndTime, getDayKey } from '../lib/timeUtils'
-import { presetThemes } from '../data/presetThemes'
-import TransitionIndicator from './TransitionIndicator'
-import TimelineRow from './TimelineRow'
-import DisplaySettingsModal from './modals/DisplaySettingsModal'
-import TemplateModal from './modals/TemplateModal'
-import ThemeSelectorModal from './modals/ThemeSelectorModal'
-import ThemeEditorModal from './modals/ThemeEditorModal'
-import TaskEditModal from './modals/TaskEditModal'
-import SetupInfoModal from './modals/SetupInfoModal'
+import { getIconComponent } from '../../data/iconLibrary'
+import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
+import { calculateEndTime, getDayKey } from '../../lib/timeUtils'
+import { presetThemes } from '../../data/presetThemes'
+import TransitionIndicator from '../display/TransitionIndicator'
+import TimelineRow from '../display/TimelineRow'
+import DisplaySettingsModal from '../modals/DisplaySettingsModal'
+import TemplateModal from '../modals/TemplateModal'
+import ThemeSelectorModal from '../modals/ThemeSelectorModal'
+import ThemeEditorModal from '../modals/ThemeEditorModal'
+import TaskEditModal from '../modals/TaskEditModal'
+import SetupInfoModal from '../modals/SetupInfoModal'
 
 export default function AdminPanel({
   timelineConfig,
@@ -220,7 +220,7 @@ export default function AdminPanel({
 
   const handleCreateCustomTheme = () => {
     const newTheme = {
-      ...presetThemes['ocean-calm'],
+      ...presetThemes['routine-ready'],
       id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: `Custom Theme ${customThemes.length + 1}`,
       emoji: '🎨',
@@ -239,34 +239,34 @@ export default function AdminPanel({
   return (
     <div className="w-full min-h-screen bg-gray-100 overflow-y-auto">
       {/* Toolbar */}
-      <div className="bg-white shadow-lg p-4 flex items-center justify-between sticky top-0 z-20 relative">
+      <header className="bg-white shadow-lg p-4 flex items-center justify-between sticky top-0 z-20 relative">
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowTemplateModal(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">Save as Template</button>
-          <button onClick={() => setShowDisplaySettings(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">Display Settings</button>
-          <button onClick={() => setShowThemeSelector(true)} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 font-semibold">
+          <button onClick={() => setShowTemplateModal(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold">Save as Template</button>
+          <button onClick={() => setShowDisplaySettings(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold">Display Settings</button>
+          <button onClick={() => setShowThemeSelector(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-accent text-brand-primary-dark rounded-[6px] hover:bg-brand-accent-light font-semibold">
             <span className="text-lg">{getThemeEmoji(currentTheme, customThemes)}</span>
             <span>Change Theme</span>
           </button>
         </div>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
-          <h1 className="text-2xl font-bold text-gray-800">Timeline Editor</h1>
+          <h1 className="text-2xl font-bold text-brand-text">Timeline Editor</h1>
           {setupData.setupComplete && (
-            <span className="text-sm text-gray-600">{setupData.schoolName} - {setupData.className}</span>
+            <span className="text-sm text-brand-text-muted">{setupData.schoolName} - {setupData.className}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowSetupInfoMenu(true)} className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-semibold">Setup Info</button>
-          <button onClick={onExitAdmin} className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 font-semibold">
+          <button onClick={() => setShowSetupInfoMenu(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold">Setup Info</button>
+          <button onClick={onExitAdmin} className="flex items-center gap-2 bg-brand-error text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-red-600 font-semibold">
             <LogOut className="w-5 h-5" />Exit Admin
           </button>
-          <button onClick={onSignOut} className="flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-semibold">
+          <button onClick={onSignOut} className="flex items-center gap-2 bg-gray-700 text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-gray-800 font-semibold">
             <LogOut className="w-5 h-5" />Sign Out
           </button>
         </div>
-      </div>
+      </header>
 
       {taskOverflowWarning && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 m-4" role="alert">
+        <div className="bg-red-100 border-l-4 border-brand-error text-red-700 p-4 m-4" role="alert">
           <p className="font-bold">Display Width Exceeded!</p>
           <p>You have {timelineConfig.tasks.length} tasks, but your current display can only show {maxTasks} tasks in {displaySettings.mode} mode.</p>
         </div>
@@ -299,31 +299,31 @@ export default function AdminPanel({
       )}
 
       {/* Main content */}
-      <div className="p-6">
+      <main className="p-6">
         {/* Weekly Schedule */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Weekly Schedule</h2>
-          <p className="text-sm text-gray-600 text-center mb-4">Assign templates to days using the buttons below. Templates will auto-load when the display starts.</p>
+        <section className="bg-white rounded-[12px] shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-brand-text mb-4 text-center">Weekly Schedule</h2>
+          <p className="text-sm text-brand-text-muted text-center mb-4">Assign templates to days using the buttons below. Templates will auto-load when the display starts.</p>
           <div className="grid grid-cols-5 gap-4 mb-6">
             {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map((day) => {
               const templateInfo = getTemplateInfo(weeklySchedule[day])
               const dayLabel = day.charAt(0).toUpperCase() + day.slice(1)
               const isToday = getDayKey(new Date().getDay()) === day
               return (
-                <div key={day} onClick={() => handleAssignToDay(day)} className={`relative border-2 border-dashed rounded-lg p-4 min-h-[140px] transition-all ${draggingTemplate ? 'border-indigo-400 bg-indigo-50 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100' : templateInfo ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50'} ${isToday ? 'ring-2 ring-yellow-400' : ''}`}>
-                  <div className={`text-center font-bold mb-2 ${isToday ? 'text-yellow-600' : 'text-gray-700'}`}>
+                <div key={day} onClick={() => handleAssignToDay(day)} className={`relative border-2 border-dashed rounded-[12px] p-4 min-h-[140px] transition-all ${draggingTemplate ? 'border-brand-primary bg-brand-primary-bg cursor-pointer hover:border-brand-primary-dark hover:bg-brand-primary-pale/20' : templateInfo ? 'border-brand-success bg-green-50' : 'border-brand-border bg-brand-bg-subtle'} ${isToday ? 'ring-2 ring-brand-accent' : ''}`}>
+                  <div className={`text-center font-bold mb-2 ${isToday ? 'text-brand-accent' : 'text-brand-text'}`}>
                     {dayLabel}
-                    {isToday && <span className="ml-1 text-xs bg-yellow-200 px-2 py-0.5 rounded-full">Today</span>}
+                    {isToday && <span className="ml-1 text-xs bg-brand-accent-bg text-brand-primary-dark px-2 py-0.5 rounded-full">Today</span>}
                   </div>
                   {templateInfo ? (
                     <div className="text-center">
-                      <div className="font-semibold text-green-700 text-sm mb-1">{templateInfo.name}</div>
-                      <div className="text-xs text-gray-600">{templateInfo.startTime} - {templateInfo.endTime}</div>
-                      <div className="text-xs text-gray-500">{templateInfo.taskCount} tasks</div>
-                      <button onClick={(e) => { e.stopPropagation(); handleRemoveFromDay(day) }} className="mt-2 px-2 py-1 text-red-500 hover:bg-red-100 rounded transition-colors text-xs font-medium">Remove</button>
+                      <div className="font-semibold text-brand-success text-sm mb-1">{templateInfo.name}</div>
+                      <div className="text-xs text-brand-text-muted">{templateInfo.startTime} - {templateInfo.endTime}</div>
+                      <div className="text-xs text-brand-text-muted">{templateInfo.taskCount} tasks</div>
+                      <button onClick={(e) => { e.stopPropagation(); handleRemoveFromDay(day) }} className="mt-2 px-3 py-2 min-h-[44px] text-brand-error hover:bg-red-100 rounded-[6px] transition-colors text-xs font-medium" aria-label={`Remove template from ${dayLabel}`}>Remove</button>
                     </div>
                   ) : (
-                    <div className="text-center text-gray-400 text-sm mt-4">
+                    <div className="text-center text-brand-text-muted text-sm mt-4">
                       <div className="text-3xl mb-2 opacity-50">+</div>
                       <div>{draggingTemplate ? 'Click to assign' : 'Select template below'}</div>
                     </div>
@@ -332,52 +332,53 @@ export default function AdminPanel({
               )
             })}
           </div>
-        </div>
+        </section>
 
         {/* Templates */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Available Templates</h2>
-          <p className="text-sm text-gray-600 text-center mb-4">
+        <section className="bg-white rounded-[12px] shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-brand-text mb-4 text-center">Available Templates</h2>
+          <p className="text-sm text-brand-text-muted text-center mb-4">
             {draggingTemplate ? 'Now click a day above to assign the template' : 'Click "Assign to Day" to select, then click a day above'}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             {templates.map((template) => (
-              <div key={template.id} className={`border-2 rounded-lg p-4 transition-all max-w-xs text-center ${selectedTemplate === template.id ? 'border-indigo-500 bg-indigo-50' : draggingTemplate === template.id ? 'border-indigo-400 bg-indigo-100 ring-2 ring-indigo-300' : 'border-gray-300 hover:border-indigo-300'}`}>
+              <div key={template.id} className={`border-2 rounded-[12px] p-4 transition-all max-w-xs text-center ${selectedTemplate === template.id ? 'border-brand-primary bg-brand-primary-bg' : draggingTemplate === template.id ? 'border-brand-primary bg-brand-primary-bg ring-2 ring-brand-primary-pale' : 'border-brand-border hover:border-brand-primary'}`}>
                 <div className="flex justify-end items-start mb-2 min-h-[24px]">
                   {template.id !== 'default' && (
-                    <button onClick={() => handleDeleteTemplate(template.id)} className="px-2 py-0.5 text-red-500 hover:bg-red-50 rounded cursor-pointer text-xs">Delete</button>
+                    <button onClick={() => handleDeleteTemplate(template.id)} className="px-3 py-2 min-h-[44px] text-brand-error hover:bg-red-50 rounded-[6px] cursor-pointer text-xs font-medium" aria-label={`Delete template ${template.name}`}>Delete</button>
                   )}
                 </div>
                 <div className="mb-3">
-                  <h3 className="font-bold text-gray-800">{template.name}</h3>
-                  <p className="text-sm text-gray-600">{template.startTime} - {template.endTime}</p>
-                  <p className="text-xs text-gray-500 mt-1">{template.tasks.length} tasks</p>
+                  <h3 className="font-bold text-brand-text">{template.name}</h3>
+                  <p className="text-sm text-brand-text-muted">{template.startTime} - {template.endTime}</p>
+                  <p className="text-xs text-brand-text-muted mt-1">{template.tasks.length} tasks</p>
                 </div>
                 <div className="flex gap-2 justify-center">
-                  <button onClick={() => handleSelectTemplateForAssign(template.id)} className={`px-3 py-2 rounded text-sm ${draggingTemplate === template.id ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                  <button onClick={() => handleSelectTemplateForAssign(template.id)} className={`px-3 min-h-[44px] py-2 rounded-[6px] text-sm font-semibold ${draggingTemplate === template.id ? 'bg-brand-bg-subtle text-brand-text border border-brand-border hover:bg-gray-200' : 'bg-brand-success text-white hover:bg-green-700'}`}>
                     {draggingTemplate === template.id ? 'Cancel' : 'Assign to Day'}
                   </button>
-                  <button onClick={() => handleLoadTemplate(template)} className="px-3 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">Load Now</button>
+                  <button onClick={() => handleLoadTemplate(template)} className="px-3 min-h-[44px] py-2 bg-brand-primary text-white rounded-[6px] text-sm hover:bg-brand-primary-dark font-semibold">Load Now</button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Edit Tasks */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <section className="bg-white rounded-[12px] shadow-lg p-6">
           <div className="relative mb-4">
-            <h2 className="text-xl font-bold text-gray-800 text-center">Edit Tasks (Pan to Navigate)</h2>
-            <button onClick={handleAddTask} className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600">
+            <h2 className="text-xl font-bold text-brand-text text-center">Edit Tasks (Pan to Navigate)</h2>
+            <button onClick={handleAddTask} className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-brand-success text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-green-700 font-semibold" aria-label="Add new task">
               <Plus className="w-5 h-5" />Add Task
             </button>
           </div>
           <div ref={scrollContainerRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} className="overflow-x-auto cursor-grab active:cursor-grabbing" style={{ userSelect: 'none' }}>
             <div className="flex items-center gap-6 p-8 min-w-max">
-              <div className="flex flex-col items-center bg-indigo-50 rounded-lg p-4 min-w-[120px]">
-                <Clock className="w-8 h-8 text-indigo-600 mb-2" />
-                <input type="time" value={timelineConfig.startTime} onChange={(e) => setTimelineConfig({ ...timelineConfig, startTime: e.target.value })} className="text-sm font-bold text-center bg-white border border-indigo-300 rounded px-1 py-1 w-24" />
-                <div className="text-xs text-indigo-600 mt-1">Start</div>
+              <div className="flex flex-col items-center bg-brand-primary-bg rounded-[12px] p-4 min-w-[120px]">
+                <Clock className="w-8 h-8 text-brand-primary mb-2" />
+                <label htmlFor="start-time" className="sr-only">Start time</label>
+                <input id="start-time" type="time" value={timelineConfig.startTime} onChange={(e) => setTimelineConfig({ ...timelineConfig, startTime: e.target.value })} className="text-sm font-bold text-center bg-white border border-brand-primary rounded-[6px] px-1 py-1 w-24" />
+                <div className="text-xs text-brand-primary-dark mt-1">Start</div>
               </div>
 
               {timelineConfig.tasks.map((task) => {
@@ -389,44 +390,44 @@ export default function AdminPanel({
                 return (
                   <Fragment key={task.id}>
                     <div className="flex flex-col">
-                      <div className="flex flex-col bg-white border-2 border-gray-300 rounded-lg p-4" style={{ minWidth: `${taskWidth}px`, width: `${taskWidth}px` }}>
+                      <div className="flex flex-col bg-white border-2 border-brand-border rounded-[12px] p-4" style={{ minWidth: `${taskWidth}px`, width: `${taskWidth}px` }}>
                         {task.type === 'image' && task.imageUrl ? (
                           <img src={task.imageUrl} alt={task.content} className="object-cover rounded mb-2 mx-auto" style={{ width: `${Math.min(taskWidth * 0.6, 96)}px`, height: `${Math.min(taskHeight * 0.6, 96)}px` }} />
                         ) : (
                           <>
-                            {IconComponent && <IconComponent className="text-indigo-600 mx-auto mb-2" style={{ width: '48px', height: '48px' }} />}
+                            {IconComponent && <IconComponent className="text-brand-primary mx-auto mb-2" style={{ width: '48px', height: '48px' }} />}
                             <div className="font-bold text-center mb-2" style={{ fontSize: `${Math.min(taskWidth / 10, 20)}px` }}>{task.content}</div>
                           </>
                         )}
                         <div className="flex items-center justify-center gap-2 mb-2">
-                          <button onClick={() => handleQuickTimeAdjust(task.id, -5)} disabled={task.duration <= 5} className={`px-2 py-1 rounded text-xs font-bold transition-colors ${task.duration <= 5 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-red-100 text-red-600 hover:bg-red-200'}`}>-5</button>
-                          <div className="text-sm text-gray-600 font-medium min-w-[50px] text-center">{task.duration} min</div>
-                          <button onClick={() => handleQuickTimeAdjust(task.id, 5)} disabled={task.duration >= 180} className={`px-2 py-1 rounded text-xs font-bold transition-colors ${task.duration >= 180 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-green-100 text-green-600 hover:bg-green-200'}`}>+5</button>
+                          <button onClick={() => handleQuickTimeAdjust(task.id, -5)} disabled={task.duration <= 5} className={`px-2 min-h-[44px] min-w-[44px] py-1 rounded-[6px] text-xs font-bold transition-colors ${task.duration <= 5 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-red-100 text-red-600 hover:bg-red-200'}`} aria-label={`Decrease ${task.content} duration by 5 minutes`}>-5</button>
+                          <div className="text-sm text-brand-text-muted font-medium min-w-[50px] text-center">{task.duration} min</div>
+                          <button onClick={() => handleQuickTimeAdjust(task.id, 5)} disabled={task.duration >= 180} className={`px-2 min-h-[44px] min-w-[44px] py-1 rounded-[6px] text-xs font-bold transition-colors ${task.duration >= 180 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-green-100 text-green-600 hover:bg-green-200'}`} aria-label={`Increase ${task.content} duration by 5 minutes`}>+5</button>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => handleEditTask(task)} className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" title="Edit Task"><Edit2 className="w-4 h-4 mx-auto" /></button>
-                          <button onClick={() => handleDeleteTask(task.id)} className="flex-1 p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors" title="Delete Task"><Trash2 className="w-4 h-4 mx-auto" /></button>
+                          <button onClick={() => handleEditTask(task)} className="flex-1 p-2 min-h-[44px] bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark transition-colors" aria-label={`Edit ${task.content}`}><Edit2 className="w-4 h-4 mx-auto" /></button>
+                          <button onClick={() => handleDeleteTask(task.id)} className="flex-1 p-2 min-h-[44px] bg-brand-error text-white rounded-[6px] hover:bg-red-600 transition-colors" aria-label={`Delete ${task.content}`}><Trash2 className="w-4 h-4 mx-auto" /></button>
                         </div>
                       </div>
                       {displaySettings.mode !== 'auto-pan' && (
-                        <div className="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div className="mt-2 p-3 bg-brand-primary-bg rounded-[12px] border border-brand-primary-pale">
                           <div className="space-y-2">
                             <div>
-                              <label className="text-xs font-medium text-purple-700">Width: {taskWidth}px</label>
+                              <label className="text-xs font-medium text-brand-primary-dark">Width: {taskWidth}px</label>
                               <input type="range" min="120" max="400" step="10" value={taskWidth} onChange={(e) => handleUpdateTaskSize(task.id, parseInt(e.target.value), taskHeight)} className="w-full" />
                             </div>
                             <div>
-                              <label className="text-xs font-medium text-purple-700">Height: {taskHeight}px</label>
+                              <label className="text-xs font-medium text-brand-primary-dark">Height: {taskHeight}px</label>
                               <input type="range" min="100" max="300" step="10" value={taskHeight} onChange={(e) => handleUpdateTaskSize(task.id, taskWidth, parseInt(e.target.value))} className="w-full" />
                             </div>
-                            <div className="text-xs text-purple-600 mt-1">Transition width: {transitionWidth.toFixed(0)}px</div>
+                            <div className="text-xs text-brand-primary-dark mt-1">Transition width: {transitionWidth.toFixed(0)}px</div>
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
-                      <div className="text-xs text-gray-600 mb-2 font-medium">Transition Preview</div>
+                    <div className="flex flex-col items-center justify-center bg-brand-bg-subtle rounded-[12px] p-4">
+                      <div className="text-xs text-brand-text-muted mb-2 font-medium">Transition Preview</div>
                       {displaySettings.transitionType === 'mascot' ? (
                         <div className="w-full h-8 bg-gray-400 rounded-full relative overflow-hidden">
                           <div className="absolute inset-0 flex items-center justify-around">
@@ -435,33 +436,33 @@ export default function AdminPanel({
                           <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xl">🚗</div>
                         </div>
                       ) : (
-                        <div className="w-full h-3 bg-gray-300 rounded-full relative overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full w-1/2"></div>
-                          <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-blue-600 rounded-full"></div>
+                        <div className="w-full h-3 bg-brand-border rounded-full relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-brand-primary to-brand-primary-dark rounded-full w-1/2"></div>
+                          <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-brand-primary rounded-full"></div>
                         </div>
                       )}
-                      <div className="text-xs text-gray-500 mt-1">Width: {transitionWidth.toFixed(0)}px</div>
+                      <div className="text-xs text-brand-text-muted mt-1">Width: {transitionWidth.toFixed(0)}px</div>
                     </div>
                   </Fragment>
                 )
               })}
 
-              <div className="flex flex-col items-center bg-red-50 rounded-lg p-4 min-w-[120px]">
-                <Clock className="w-8 h-8 text-red-600 mb-2" />
-                <div className="text-xl font-bold bg-white border border-red-300 rounded px-2 py-1 w-28 text-center">{calculateEndTime(timelineConfig.startTime, timelineConfig.tasks)}</div>
-                <div className="text-xs text-red-600 mt-1">End</div>
+              <div className="flex flex-col items-center bg-red-50 rounded-[12px] p-4 min-w-[120px]">
+                <Clock className="w-8 h-8 text-brand-error mb-2" />
+                <div className="text-xl font-bold bg-white border border-brand-error rounded-[6px] px-2 py-1 w-28 text-center">{calculateEndTime(timelineConfig.startTime, timelineConfig.tasks)}</div>
+                <div className="text-xs text-brand-error mt-1">End</div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Live Display Preview */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+        <section className="bg-white rounded-[12px] shadow-lg p-6 mt-6">
+          <h2 className="text-xl font-bold text-brand-text mb-4 text-center">
             Live Display Preview - What Students See
-            <span className="ml-3 text-sm font-normal text-gray-600">(Scaled to {displaySettings.width}x{displaySettings.height} at {displaySettings.scale}% zoom)</span>
+            <span className="ml-3 text-sm font-normal text-brand-text-muted">(Scaled to {displaySettings.width}x{displaySettings.height} at {displaySettings.scale}% zoom)</span>
           </h2>
-          <div className="border-2 border-gray-300 rounded-lg overflow-x-auto overflow-y-hidden bg-gray-200 p-4 flex justify-center items-center" style={{ height: `${displaySettings.height * scaleFactor * Math.min(1, 1200 / (displaySettings.width * scaleFactor)) + 40}px` }}>
+          <div className="border-2 border-brand-border rounded-[12px] overflow-x-auto overflow-y-hidden bg-gray-200 p-4 flex justify-center items-center" style={{ height: `${displaySettings.height * scaleFactor * Math.min(1, 1200 / (displaySettings.width * scaleFactor)) + 40}px` }}>
             <div className="relative rounded-xl shadow-xl overflow-hidden" style={{
               background: getBackgroundStyle(theme),
               width: `${displaySettings.width * scaleFactor}px`,
@@ -486,8 +487,8 @@ export default function AdminPanel({
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   )
 }
@@ -521,7 +522,7 @@ function PreviewHorizontal({ timelineConfig, displaySettings, theme, currentTask
                   <img src={task.imageUrl} alt={task.content} className="object-cover rounded-lg mb-3" style={{ width: `${Math.min(taskWidth * 0.7, 128)}px`, height: `${Math.min(taskHeight * 0.6, 128)}px` }} />
                 ) : (
                   <>
-                    {IconComponent && <IconComponent className="text-indigo-600 mb-3" style={{ width: `${Math.min(taskWidth * 0.5, 80)}px`, height: `${Math.min(taskWidth * 0.5, 80)}px` }} />}
+                    {IconComponent && <IconComponent className="mb-3" style={{ color: theme.cardBorderColor, width: `${Math.min(taskWidth * 0.5, 80)}px`, height: `${Math.min(taskWidth * 0.5, 80)}px` }} />}
                     <div className="text-gray-800 text-center mb-3" style={getFontStyle(theme, Math.min(taskWidth / 5, 36))}>{task.content}</div>
                   </>
                 )}
@@ -549,20 +550,20 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
   return (
     <div className="w-full h-full flex flex-col">
       {(displaySettings.topBannerImage || displaySettings.showClock) && (
-        <div className="flex items-center justify-center py-2 bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div className="flex items-center justify-center py-2 bg-gradient-to-r from-brand-primary to-brand-primary-dark">
           {displaySettings.topBannerImage && <img src={displaySettings.topBannerImage} alt="Top Banner" className="max-h-12 object-contain" />}
           {displaySettings.showClock && <div className="text-2xl font-bold text-white ml-4">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>}
         </div>
       )}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full flex items-stretch gap-2" style={{ height: `${displaySettings.autoPanTileHeight}%` }}>
-          <div className="flex flex-col items-center justify-center rounded-xl shadow-xl p-4 bg-gradient-to-br from-blue-100 to-blue-200 border-4 border-blue-400" style={{ flex: '1' }}>
+          <div className="flex flex-col items-center justify-center rounded-xl shadow-xl p-4" style={{ flex: '1', background: `linear-gradient(to bottom right, ${theme.bgGradientFrom}, ${theme.bgGradientTo})`, border: `4px solid ${theme.cardBorderColor}` }}>
             {currentTask ? (
               <>
-                <div className="text-xs font-semibold text-blue-600 mb-2">CURRENT TASK</div>
+                <div className="text-xs font-semibold mb-2" style={{ color: theme.cardBorderColor }}>CURRENT TASK</div>
                 {currentTask.type === 'image' && currentTask.imageUrl ? (
                   <img src={currentTask.imageUrl} alt={currentTask.content} className="object-contain rounded-lg mb-2" style={{ maxWidth: '80px', maxHeight: '80px' }} />
-                ) : CurrentIcon && <CurrentIcon className="text-indigo-600 mb-2" style={{ width: '40px', height: '40px' }} />}
+                ) : CurrentIcon && <CurrentIcon className="mb-2" style={{ color: theme.cardBorderColor, width: '40px', height: '40px' }} />}
                 <div className="text-xl font-bold text-gray-800 text-center">{currentTask.content}</div>
                 <div className="text-sm text-gray-600 mt-2">{currentTask.duration} min</div>
               </>
@@ -578,7 +579,7 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
                 <div className="text-xs font-semibold text-gray-500 mb-2">NEXT TASK</div>
                 {nextTask.type === 'image' && nextTask.imageUrl ? (
                   <img src={nextTask.imageUrl} alt={nextTask.content} className="object-contain rounded-lg mb-2" style={{ maxWidth: '60px', maxHeight: '60px' }} />
-                ) : NextIcon && <NextIcon className="text-indigo-600 mb-2" style={{ width: '32px', height: '32px' }} />}
+                ) : NextIcon && <NextIcon className="mb-2" style={{ color: theme.cardBorderColor, width: '32px', height: '32px' }} />}
                 <div className="text-lg font-bold text-gray-700 text-center">{nextTask.content}</div>
                 <div className="text-xs text-gray-500 mt-2">{nextTask.duration} min</div>
               </>
@@ -587,7 +588,7 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
         </div>
       </div>
       {displaySettings.bottomBannerImage && (
-        <div className="flex items-center justify-center py-2 bg-gradient-to-r from-purple-600 to-indigo-500">
+        <div className="flex items-center justify-center py-2 bg-gradient-to-r from-brand-primary-dark to-brand-primary">
           <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" className="max-h-12 object-contain" />
         </div>
       )}

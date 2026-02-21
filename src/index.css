@@ -1,11 +1,83 @@
 @import "tailwindcss";
 @import "./styles/fonts.css";
 
+@theme {
+  /* Brand Primary — Teal */
+  --color-brand-primary: #0D9488;
+  --color-brand-primary-dark: #134E4A;
+  --color-brand-primary-pale: #99F6E4;
+  --color-brand-primary-bg: #F0FDFA;
+
+  /* Brand Accent — Amber */
+  --color-brand-accent: #F59E0B;
+  --color-brand-accent-light: #FCD34D;
+  --color-brand-accent-bg: #FFFBEB;
+
+  /* Neutral / UI */
+  --color-brand-bg: #FFFFFF;
+  --color-brand-bg-subtle: #F9FAFB;
+  --color-brand-text: #1F2937;
+  --color-brand-text-muted: #6B7280;
+  --color-brand-border: #D1D5DB;
+
+  /* Feedback */
+  --color-brand-error: #DC2626;
+  --color-brand-success: #16A34A;
+  --color-brand-warning: #F59E0B;
+
+  /* Shadows */
+  --shadow-brand-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-brand-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-brand-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Border Radii */
+  --radius-brand-sm: 4px;
+  --radius-brand-md: 6px;
+  --radius-brand-lg: 12px;
+  --radius-brand-xl: 16px;
+}
+
+:root {
+  /* CSS variables for non-Tailwind usage (inline styles, JS) */
+  --brand-primary: #0D9488;
+  --brand-primary-dark: #134E4A;
+  --brand-primary-pale: #99F6E4;
+  --brand-primary-bg: #F0FDFA;
+
+  --brand-accent: #F59E0B;
+  --brand-accent-light: #FCD34D;
+  --brand-accent-bg: #FFFBEB;
+
+  --brand-bg: #FFFFFF;
+  --brand-bg-subtle: #F9FAFB;
+  --brand-text: #1F2937;
+  --brand-text-muted: #6B7280;
+  --brand-border: #D1D5DB;
+
+  --brand-error: #DC2626;
+  --brand-success: #16A34A;
+  --brand-warning: #F59E0B;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--brand-text);
 }
 
 #root {
@@ -17,4 +89,20 @@ html, body {
 
 button, a, label {
   cursor: pointer;
+}
+
+/* Global focus-visible ring using brand primary */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

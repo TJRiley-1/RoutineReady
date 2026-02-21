@@ -15,14 +15,14 @@ export default function DisplaySettingsModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-[700px] shadow-2xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Display Settings</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="display-settings-title">
+      <div className="bg-white rounded-[16px] p-8 w-[700px] shadow-lg max-h-[90vh] overflow-y-auto">
+        <h2 id="display-settings-title" className="text-2xl font-bold mb-6 text-brand-text">Display Settings</h2>
 
         <div className="space-y-6">
           {/* Display Mode */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Display Mode</label>
+            <label className="block text-sm font-medium text-brand-text mb-3">Display Mode</label>
             <div className="grid grid-cols-3 gap-3">
               {[
                 { mode: 'horizontal', label: 'Horizontal', desc: 'Ultra-wide displays' },
@@ -32,10 +32,10 @@ export default function DisplaySettingsModal({
                 <button
                   key={mode}
                   onClick={() => setDisplaySettings({ ...displaySettings, mode })}
-                  className={`p-4 border-2 rounded-lg ${displaySettings.mode === mode ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                  className={`p-4 border-2 rounded-[6px] ${displaySettings.mode === mode ? 'border-brand-primary bg-brand-primary-bg' : 'border-brand-border'}`}
                 >
                   <div className="font-bold">{label}</div>
-                  <div className="text-xs text-gray-600">{desc}</div>
+                  <div className="text-xs text-brand-text-muted">{desc}</div>
                 </button>
               ))}
             </div>
@@ -45,7 +45,7 @@ export default function DisplaySettingsModal({
           {displaySettings.mode === 'multi-row' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Number of Rows: {displaySettings.rows} (Max: {maxRows})
                 </label>
                 <input
@@ -61,7 +61,7 @@ export default function DisplaySettingsModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-brand-text mb-3">
                   Path Direction
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -74,10 +74,10 @@ export default function DisplaySettingsModal({
                       onClick={() =>
                         setDisplaySettings({ ...displaySettings, pathDirection: dir })
                       }
-                      className={`p-4 border-2 rounded-lg ${displaySettings.pathDirection === dir ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                      className={`p-4 border-2 rounded-[6px] ${displaySettings.pathDirection === dir ? 'border-brand-primary bg-brand-primary-bg' : 'border-brand-border'}`}
                     >
                       <div className="font-bold">{label}</div>
-                      <div className="text-xs text-gray-600 whitespace-pre">{desc}</div>
+                      <div className="text-xs text-brand-text-muted whitespace-pre">{desc}</div>
                     </button>
                   ))}
                 </div>
@@ -87,7 +87,7 @@ export default function DisplaySettingsModal({
 
           {/* Transition Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-brand-text mb-3">
               Transition Indicator
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -95,10 +95,10 @@ export default function DisplaySettingsModal({
                 onClick={() =>
                   setDisplaySettings({ ...displaySettings, transitionType: 'progress-line' })
                 }
-                className={`p-4 border-2 rounded-lg ${displaySettings.transitionType === 'progress-line' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                className={`p-4 border-2 rounded-[6px] ${displaySettings.transitionType === 'progress-line' ? 'border-brand-primary bg-brand-primary-bg' : 'border-brand-border'}`}
               >
                 <div className="font-bold">Progress Line</div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-brand-text-muted">
                   Simple line with moving dot (like music players)
                 </div>
               </button>
@@ -106,10 +106,10 @@ export default function DisplaySettingsModal({
                 onClick={() =>
                   setDisplaySettings({ ...displaySettings, transitionType: 'mascot' })
                 }
-                className={`p-4 border-2 rounded-lg ${displaySettings.transitionType === 'mascot' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                className={`p-4 border-2 rounded-[6px] ${displaySettings.transitionType === 'mascot' ? 'border-brand-primary bg-brand-primary-bg' : 'border-brand-border'}`}
               >
                 <div className="font-bold">Road with Mascot</div>
-                <div className="text-xs text-gray-600">Character travels along a road</div>
+                <div className="text-xs text-brand-text-muted">Character travels along a road</div>
               </button>
             </div>
           </div>
@@ -117,14 +117,14 @@ export default function DisplaySettingsModal({
           {/* Mascot Upload */}
           {displaySettings.transitionType === 'mascot' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Upload Class Mascot Image
               </label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleMascotUpload}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg"
+                className="w-full p-3 border-2 border-brand-border rounded-[6px]"
               />
               {displaySettings.mascotImage && (
                 <div className="mt-2">
@@ -135,7 +135,7 @@ export default function DisplaySettingsModal({
                   />
                 </div>
               )}
-              <p className="text-xs text-gray-500 mt-1">Default: 🚗 (car emoji)</p>
+              <p className="text-xs text-brand-text-muted mt-1">Default: 🚗 (car emoji)</p>
             </div>
           )}
 
@@ -143,7 +143,7 @@ export default function DisplaySettingsModal({
           {displaySettings.mode === 'auto-pan' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Top Banner Image (Optional)
                 </label>
                 <input
@@ -154,7 +154,7 @@ export default function DisplaySettingsModal({
                       setDisplaySettings({ ...displaySettings, topBannerImage: dataUrl })
                     })
                   }
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg"
+                  className="w-full p-3 border-2 border-brand-border rounded-[6px]"
                 />
                 {displaySettings.topBannerImage && (
                   <div className="mt-2 flex items-center gap-2">
@@ -167,17 +167,18 @@ export default function DisplaySettingsModal({
                       onClick={() =>
                         setDisplaySettings({ ...displaySettings, topBannerImage: null })
                       }
-                      className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                      className="px-2 py-1 bg-brand-error text-white text-xs rounded-[6px] hover:bg-red-600"
+                      aria-label="Remove top banner"
                     >
                       Remove
                     </button>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-1">Good for school logos or class names</p>
+                <p className="text-xs text-brand-text-muted mt-1">Good for school logos or class names</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Bottom Banner Image (Optional)
                 </label>
                 <input
@@ -188,7 +189,7 @@ export default function DisplaySettingsModal({
                       setDisplaySettings({ ...displaySettings, bottomBannerImage: dataUrl })
                     })
                   }
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg"
+                  className="w-full p-3 border-2 border-brand-border rounded-[6px]"
                 />
                 {displaySettings.bottomBannerImage && (
                   <div className="mt-2 flex items-center gap-2">
@@ -201,13 +202,14 @@ export default function DisplaySettingsModal({
                       onClick={() =>
                         setDisplaySettings({ ...displaySettings, bottomBannerImage: null })
                       }
-                      className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                      className="px-2 py-1 bg-brand-error text-white text-xs rounded-[6px] hover:bg-red-600"
+                      aria-label="Remove bottom banner"
                     >
                       Remove
                     </button>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-brand-text-muted mt-1">
                   Good for decorative images or additional info
                 </p>
               </div>
@@ -222,13 +224,13 @@ export default function DisplaySettingsModal({
                   }
                   className="w-4 h-4"
                 />
-                <label htmlFor="showClock" className="text-sm text-gray-700">
+                <label htmlFor="showClock" className="text-sm text-brand-text">
                   Show live clock in banner area
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brand-text mb-2">
                   Task Tile Height: {displaySettings.autoPanTileHeight}% of display height
                 </label>
                 <input
@@ -245,7 +247,7 @@ export default function DisplaySettingsModal({
                   max="80"
                   step="5"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-brand-text-muted mt-1">
                   Adjust to prevent interference with banner images
                 </p>
               </div>
@@ -254,7 +256,7 @@ export default function DisplaySettingsModal({
 
           {/* Common resolutions */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-brand-text mb-3">
               Common Display Resolutions
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -262,25 +264,25 @@ export default function DisplaySettingsModal({
                 onClick={() =>
                   setDisplaySettings({ ...displaySettings, width: 2560, height: 1080 })
                 }
-                className="p-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 text-left"
+                className="p-3 border-2 border-brand-border rounded-[6px] hover:border-brand-primary text-left"
               >
                 <div className="font-bold">2560 × 1080</div>
-                <div className="text-xs text-gray-600">Ultra-wide 21:9</div>
+                <div className="text-xs text-brand-text-muted">Ultra-wide 21:9</div>
               </button>
               <button
                 onClick={() =>
                   setDisplaySettings({ ...displaySettings, width: 1920, height: 1080 })
                 }
-                className="p-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 text-left"
+                className="p-3 border-2 border-brand-border rounded-[6px] hover:border-brand-primary text-left"
               >
                 <div className="font-bold">1920 × 1080</div>
-                <div className="text-xs text-gray-600">Full HD 16:9</div>
+                <div className="text-xs text-brand-text-muted">Full HD 16:9</div>
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brand-text mb-2">
               Width: {displaySettings.width}px
             </label>
             <input
@@ -292,14 +294,14 @@ export default function DisplaySettingsModal({
                   width: parseInt(e.target.value) || 1920,
                 })
               }
-              className="w-full p-3 border-2 border-gray-300 rounded-lg"
+              className="w-full p-3 h-[44px] border-2 border-brand-border rounded-[6px] focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"
               min="800"
               max="7680"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brand-text mb-2">
               Height: {displaySettings.height}px
             </label>
             <input
@@ -311,14 +313,14 @@ export default function DisplaySettingsModal({
                   height: parseInt(e.target.value) || 1080,
                 })
               }
-              className="w-full p-3 border-2 border-gray-300 rounded-lg"
+              className="w-full p-3 h-[44px] border-2 border-brand-border rounded-[6px] focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"
               min="600"
               max="2160"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brand-text mb-2">
               Scale: {displaySettings.scale}%
             </label>
             <input
@@ -334,9 +336,9 @@ export default function DisplaySettingsModal({
             />
           </div>
 
-          <div className="bg-indigo-50 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-700 mb-2">Display Capacity:</div>
-            <div className="text-sm text-gray-600">
+          <div className="bg-brand-primary-bg p-4 rounded-[6px]">
+            <div className="text-sm font-medium text-brand-text mb-2">Display Capacity:</div>
+            <div className="text-sm text-brand-text-muted">
               <div>
                 <strong>Max Tasks:</strong> {maxTasks} tasks
               </div>
@@ -344,7 +346,7 @@ export default function DisplaySettingsModal({
                 <strong>Current Tasks:</strong> {taskCount} tasks
               </div>
               {taskCount > maxTasks && (
-                <div className="text-red-600 font-bold mt-2">
+                <div className="text-brand-error font-bold mt-2">
                   {taskCount - maxTasks} tasks exceed display capacity!
                 </div>
               )}
@@ -355,13 +357,13 @@ export default function DisplaySettingsModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold"
+            className="flex-1 bg-brand-primary text-white min-h-[44px] py-3 rounded-[6px] hover:bg-brand-primary-dark font-semibold"
           >
             Save Settings
           </button>
           <button
             onClick={onClose}
-            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
+            className="px-6 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold"
           >
             Cancel
           </button>

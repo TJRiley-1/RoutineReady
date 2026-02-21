@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import { Clock } from 'lucide-react'
-import { getIconComponent } from '../data/iconLibrary'
-import { getFontStyle, getBackgroundStyle } from '../lib/themeUtils'
-import { calculateEndTime } from '../lib/timeUtils'
+import { getIconComponent } from '../../data/iconLibrary'
+import { getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
+import { calculateEndTime } from '../../lib/timeUtils'
 import TransitionIndicator from './TransitionIndicator'
 import TimelineRow from './TimelineRow'
 
@@ -20,7 +20,7 @@ export default function DisplayView({
   const bgStyle = getBackgroundStyle(theme)
 
   return (
-    <div
+    <main
       className="relative w-screen h-screen overflow-hidden"
       style={{ background: bgStyle }}
     >
@@ -79,7 +79,7 @@ export default function DisplayView({
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 
@@ -141,8 +141,9 @@ function HorizontalTimeline({ timelineConfig, displaySettings, theme, currentTas
                 <>
                   {IconComponent && (
                     <IconComponent
-                      className="text-indigo-600 mb-3"
+                      className="mb-3"
                       style={{
+                        color: theme.cardBorderColor,
                         width: `${Math.min(taskWidth * 0.5, 80)}px`,
                         height: `${Math.min(taskWidth * 0.5, 80)}px`,
                       }}
@@ -236,7 +237,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
     <div className="w-full h-full flex flex-col">
       {/* Top Banner */}
       {(displaySettings.topBannerImage || displaySettings.showClock) && (
-        <div className="flex items-center justify-center py-4 bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div className="flex items-center justify-center py-4" style={{ background: `linear-gradient(to right, ${theme.cardBorderColor}, ${theme.cardBorderColorAlt || theme.cardBorderColor})` }}>
           {displaySettings.topBannerImage && (
             <img src={displaySettings.topBannerImage} alt="Top Banner" className="max-h-20 object-contain" />
           )}
@@ -280,7 +281,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
                   />
                 ) : (
                   CurrentIcon && (
-                    <CurrentIcon className="text-indigo-600 mb-4" style={{ width: '80px', height: '80px' }} />
+                    <CurrentIcon className="mb-4" style={{ color: theme.cardBorderColor, width: '80px', height: '80px' }} />
                   )
                 )}
                 <div className="text-gray-800 text-center" style={getFontStyle(theme, 36)}>
@@ -331,7 +332,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
                   />
                 ) : (
                   NextIcon && (
-                    <NextIcon className="text-indigo-600 mb-4" style={{ width: '64px', height: '64px' }} />
+                    <NextIcon className="mb-4" style={{ color: theme.cardBorderColor, width: '64px', height: '64px' }} />
                   )
                 )}
                 <div className="text-gray-700 text-center" style={getFontStyle(theme, 28)}>
@@ -348,7 +349,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
 
       {/* Bottom Banner */}
       {displaySettings.bottomBannerImage && (
-        <div className="flex items-center justify-center py-4 bg-gradient-to-r from-purple-600 to-indigo-500">
+        <div className="flex items-center justify-center py-4" style={{ background: `linear-gradient(to right, ${theme.cardBorderColorAlt || theme.cardBorderColor}, ${theme.cardBorderColor})` }}>
           <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" className="max-h-20 object-contain" />
         </div>
       )}

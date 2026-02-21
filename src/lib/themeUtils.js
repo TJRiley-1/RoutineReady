@@ -5,7 +5,7 @@ export function getActiveTheme(currentTheme, customThemes) {
     return presetThemes[currentTheme]
   }
   const customTheme = customThemes.find((t) => t.id === currentTheme)
-  return customTheme || presetThemes['ocean-calm']
+  return customTheme || presetThemes['routine-ready']
 }
 
 export function getThemeName(currentTheme, customThemes) {

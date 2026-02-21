@@ -1,4 +1,4 @@
-import { getProgressPercentage, getDotColor } from '../lib/timeUtils'
+import { getProgressPercentage, getDotColor } from '../../lib/timeUtils'
 
 export default function ProgressLine({ taskDuration, elapsed, isPast, isActive, lineWidth, theme }) {
   const progressPercentage = getProgressPercentage(isPast, isActive, elapsed, taskDuration)
