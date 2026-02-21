@@ -10,15 +10,36 @@ import {
 } from '../data/defaults'
 
 // Debounce helper for saving to Supabase
+// Returns [debouncedFn, flushFn] — call flushFn() to immediately execute any pending save
 function useDebouncedSave(saveFn, delay = 800) {
   const timeoutRef = useRef(null)
   const saveFnRef = useRef(saveFn)
+  const pendingArgsRef = useRef(null)
   saveFnRef.current = saveFn
 
-  return useCallback((...args) => {
+  const debounced = useCallback((...args) => {
+    pendingArgsRef.current = args
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => saveFnRef.current(...args), delay)
+    timeoutRef.current = setTimeout(() => {
+      pendingArgsRef.current = null
+      saveFnRef.current(...args)
+    }, delay)
   }, [delay])
+
+  const flush = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    if (pendingArgsRef.current) {
+      const args = pendingArgsRef.current
+      pendingArgsRef.current = null
+      return saveFnRef.current(...args)
+    }
+    return Promise.resolve()
+  }, [])
+
+  return [debounced, flush]
 }
 
 export function useAppData(session) {
@@ -369,7 +390,7 @@ export function useAppData(session) {
   }
 
   // --- Debounced Supabase save functions ---
-  const saveDisplaySettingsToDb = useDebouncedSave(async (settings, theme) => {
+  const [saveDisplaySettingsToDb, flushDisplaySettings] = useDebouncedSave(async (settings, theme) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('display_settings')
@@ -402,7 +423,7 @@ export function useAppData(session) {
     }
   })
 
-  const saveTimelineToDb = useDebouncedSave(async (config, templateId) => {
+  const [saveTimelineToDb, flushTimeline] = useDebouncedSave(async (config, templateId) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('active_timeline')
@@ -426,7 +447,7 @@ export function useAppData(session) {
     }
   })
 
-  const saveTemplatesToDb = useDebouncedSave(async (allTemplates) => {
+  const [saveTemplatesToDb, flushTemplates] = useDebouncedSave(async (allTemplates) => {
     if (!schoolId) return
     await supabase.from('templates').delete().eq('school_id', schoolId)
 
@@ -461,7 +482,7 @@ export function useAppData(session) {
     }
   })
 
-  const saveWeeklyScheduleToDb = useDebouncedSave(async (schedule) => {
+  const [saveWeeklyScheduleToDb, flushWeeklySchedule] = useDebouncedSave(async (schedule) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('weekly_schedules')
@@ -486,7 +507,7 @@ export function useAppData(session) {
     }
   })
 
-  const saveCustomThemesToDb = useDebouncedSave(async (themes) => {
+  const [saveCustomThemesToDb, flushCustomThemes] = useDebouncedSave(async (themes) => {
     if (!schoolId) return
     await supabase.from('custom_themes').delete().eq('school_id', schoolId)
 
@@ -804,6 +825,14 @@ export function useAppData(session) {
   }
 
   const handleSignOut = async () => {
+    // Flush all pending debounced saves before clearing state
+    await Promise.all([
+      flushDisplaySettings(),
+      flushTimeline(),
+      flushTemplates(),
+      flushWeeklySchedule(),
+      flushCustomThemes(),
+    ])
     setSchoolId(null)
     setDataLoaded(false)
     initialLoadDone.current = false
