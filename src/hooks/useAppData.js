@@ -38,6 +38,9 @@ export function useAppData(session) {
   const [customThemes, setCustomThemes] = useState([])
   const [weeklySchedule, setWeeklySchedule] = useState(defaultWeeklySchedule)
 
+  // Guided tour state
+  const [setupGuideCompleted, setSetupGuideCompleted] = useState(false)
+
   // Non-persisted state
   const [activeTemplateId, setActiveTemplateId] = useState(null)
   const [todaysTemplateName, setTodaysTemplateName] = useState(null)
@@ -145,6 +148,7 @@ export function useAppData(session) {
         roadHeight: ds.road_height ?? 32,
       })
       setCurrentTheme(ds.current_theme || 'routine-ready')
+      setSetupGuideCompleted(!!ds.setup_guide_completed)
     }
 
     // 3. Load templates with tasks
@@ -955,6 +959,21 @@ export function useAppData(session) {
     initialLoadDone.current = false
   }
 
+  const markGuideCompleted = useCallback(async () => {
+    setSetupGuideCompleted(true)
+    if (!schoolId) return
+    const { data: existing } = await supabase
+      .from('display_settings')
+      .select('id')
+      .eq('school_id', schoolId)
+      .limit(1)
+      .single()
+
+    if (existing) {
+      await supabase.from('display_settings').update({ setup_guide_completed: true }).eq('id', existing.id)
+    }
+  }, [schoolId])
+
   return {
     dataLoaded,
     showSetupWizard,
@@ -992,5 +1011,7 @@ export function useAppData(session) {
     handleSkipSetup,
     handleResetSetup,
     handleSignOut,
+    setupGuideCompleted,
+    markGuideCompleted,
   }
 }

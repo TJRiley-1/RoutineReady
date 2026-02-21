@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef } from 'react'
+import { Fragment, useState, useRef, useEffect } from 'react'
 import { Plus, Clock, Edit2, Trash2, Save, BookmarkPlus, Monitor, Palette, Settings, ArrowLeft } from 'lucide-react'
 import { getIconComponent } from '../../data/iconLibrary'
 import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
@@ -15,6 +15,8 @@ import ThemeSelectorModal from '../modals/ThemeSelectorModal'
 import ThemeEditorModal from '../modals/ThemeEditorModal'
 import TaskEditModal from '../modals/TaskEditModal'
 import UserSettingsModal from '../modals/UserSettingsModal'
+import GuidedTour from './GuidedTour'
+import { useGuidedTour } from '../../hooks/useGuidedTour'
 
 export default function AdminPanel({
   timelineConfig,
@@ -46,6 +48,8 @@ export default function AdminPanel({
   onResetSetup,
   onRestoreBackup,
   onSignOut,
+  startGuidedTour,
+  onGuideCompleted,
 }) {
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [newTemplateName, setNewTemplateName] = useState('')
@@ -61,6 +65,51 @@ export default function AdminPanel({
   const [notification, setNotification] = useState(null)
   const [confirmState, setConfirmState] = useState(null)
   const [draggingTemplate, setDraggingTemplate] = useState(null)
+
+  // Guided tour
+  const tour = useGuidedTour({
+    onOpenDisplaySettings: () => setShowDisplaySettings(true),
+    onCloseDisplaySettings: () => setShowDisplaySettings(false),
+    onOpenThemeSelector: () => setShowThemeSelector(true),
+    onCloseThemeSelector: () => setShowThemeSelector(false),
+    onExitAdmin: onExitAdmin,
+    onMarkCompleted: onGuideCompleted || (() => {}),
+  })
+
+  // Auto-start tour after setup completes
+  useEffect(() => {
+    if (startGuidedTour && !tour.isActive) {
+      const timer = setTimeout(() => tour.startTour(), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [startGuidedTour])
+
+  // Scroll to section when step changes
+  useEffect(() => {
+    if (tour.isActive && tour.stepConfig?.scrollTo) {
+      const el = document.getElementById(tour.stepConfig.scrollTo)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [tour.isActive, tour.currentStep])
+
+  const handleTourAction = () => {
+    if (tour.stepConfig?.id === 'screen-size') {
+      // Apply detected screen dimensions
+      setDisplaySettings({
+        ...displaySettings,
+        width: window.screen.width,
+        height: window.screen.height,
+      })
+    } else if (tour.stepConfig?.id === 'done') {
+      tour.skipTour()
+      onExitAdmin()
+    }
+  }
+
+  const handleRestartGuide = () => {
+    setShowUserSettings(false)
+    setTimeout(() => tour.startTour(), 200)
+  }
 
   const scrollContainerRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -341,6 +390,7 @@ export default function AdminPanel({
           onResetSetup={() => { setShowUserSettings(false); onResetSetup() }}
           onRestoreBackup={(e) => { setShowUserSettings(false); onRestoreBackup(e) }}
           onSignOut={() => { setShowUserSettings(false); onSignOut() }}
+          onRestartGuide={handleRestartGuide}
           onClose={() => setShowUserSettings(false)}
         />
       )}
@@ -363,7 +413,7 @@ export default function AdminPanel({
       {/* Main content */}
       <main className="p-6">
         {/* Weekly Schedule */}
-        <section className="bg-white rounded-[12px] shadow-lg p-6 mb-6">
+        <section id="weekly-schedule-section" className="bg-white rounded-[12px] shadow-lg p-6 mb-6">
           <h2 className="text-xl font-bold text-brand-text mb-4 text-center">Weekly Schedule</h2>
           <p className="text-sm text-brand-text-muted text-center mb-4">Assign templates to days using the buttons below. Templates will auto-load when the display starts.</p>
           <div className="grid grid-cols-5 gap-4 mb-6">
@@ -427,7 +477,7 @@ export default function AdminPanel({
         </section>
 
         {/* Edit Tasks */}
-        <section className="bg-white rounded-[12px] shadow-lg p-6">
+        <section id="edit-tasks-section" className="bg-white rounded-[12px] shadow-lg p-6">
           <div className="relative mb-4">
             <h2 className="text-xl font-bold text-brand-text text-center">Edit Tasks (Pan to Navigate)</h2>
             <button onClick={handleAddTask} className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-brand-success text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-green-700 font-semibold" aria-label="Add new task">
@@ -551,6 +601,20 @@ export default function AdminPanel({
           </div>
         </section>
       </main>
+
+      {/* Guided Tour Overlay */}
+      {tour.isActive && (
+        <GuidedTour
+          stepConfig={tour.stepConfig}
+          currentStep={tour.currentStep}
+          totalSteps={tour.totalSteps}
+          onNext={tour.nextStep}
+          onPrev={tour.prevStep}
+          onSkip={tour.skipTour}
+          onAction={handleTourAction}
+          detectedScreen={{ width: window.screen.width, height: window.screen.height }}
+        />
+      )}
     </div>
   )
 }

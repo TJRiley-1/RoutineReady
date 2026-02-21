@@ -54,7 +54,11 @@ export default function App() {
     handleSkipSetup,
     handleResetSetup,
     handleSignOut: appDataSignOut,
+    setupGuideCompleted,
+    markGuideCompleted,
   } = useAppData(session)
+
+  const [justCompletedSetup, setJustCompletedSetup] = useState(false)
 
   // Timeline progress
   const { currentTime, currentTaskIndex, elapsedInTask } = useTimelineProgress(timelineConfig)
@@ -177,11 +181,25 @@ export default function App() {
           setSetupStep={setSetupStep}
           setupData={setupData || defaultSetupData}
           setSetupData={setSetupData}
-          onComplete={handleCompleteSetup}
-          onSkip={handleSkipSetup}
+          onComplete={async () => {
+            await handleCompleteSetup()
+            if (!setupGuideCompleted) {
+              setJustCompletedSetup(true)
+              setIsAdmin(true)
+            }
+          }}
+          onSkip={async () => {
+            await handleSkipSetup()
+            if (!setupGuideCompleted) {
+              setJustCompletedSetup(true)
+              setIsAdmin(true)
+            }
+          }}
         />
       ) : isAdmin ? (
         <AdminPanel
+          startGuidedTour={justCompletedSetup && !setupGuideCompleted}
+          onGuideCompleted={() => { markGuideCompleted(); setJustCompletedSetup(false) }}
           timelineConfig={timelineConfig}
           setTimelineConfig={updateTimelineConfig}
           templates={templates}

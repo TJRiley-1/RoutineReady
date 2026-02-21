@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Edit, Upload, RefreshCw, LogOut, User, KeyRound } from 'lucide-react'
+import { Edit, Upload, RefreshCw, LogOut, User, KeyRound, Play } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import Notification from '../ui/Notification'
 
@@ -9,6 +9,7 @@ export default function UserSettingsModal({
   onEditSetup,
   onResetSetup,
   onRestoreBackup,
+  onRestartGuide,
   onSignOut,
   onClose,
 }) {
@@ -153,6 +154,15 @@ export default function UserSettingsModal({
                 className="hidden"
               />
             </label>
+            {onRestartGuide && (
+              <button
+                onClick={onRestartGuide}
+                className="w-full flex items-center justify-center gap-2 bg-brand-accent text-brand-primary-dark min-h-[44px] py-3 rounded-[6px] hover:bg-brand-accent-light transition-colors font-semibold"
+              >
+                <Play className="w-5 h-5" />
+                Restart Setup Guide
+              </button>
+            )}
             <button
               onClick={onResetSetup}
               className="w-full flex items-center justify-center gap-2 bg-brand-error text-white min-h-[44px] py-3 rounded-[6px] hover:bg-red-600 transition-colors font-semibold"

@@ -70,6 +70,7 @@ create table display_settings (
   show_clock boolean default false,
   auto_pan_tile_height int default 60,
   current_theme text default 'ocean-calm',
+  setup_guide_completed boolean default false,
   created_at timestamptz default now()
 );
 
