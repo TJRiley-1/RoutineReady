@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { X, Check, Edit, Trash2, Plus } from 'lucide-react'
 import { presetThemes } from '../../data/presetThemes'
+import ConfirmModal from './ConfirmModal'
 
 export default function ThemeSelectorModal({
   currentTheme,
@@ -10,6 +12,8 @@ export default function ThemeSelectorModal({
   onEditCustom,
   onClose,
 }) {
+  const [confirmState, setConfirmState] = useState(null)
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8" role="dialog" aria-modal="true" aria-labelledby="theme-selector-title">
       <div className="bg-white rounded-[16px] p-8 w-full max-w-5xl shadow-lg max-h-[90vh] overflow-y-auto">
@@ -95,12 +99,19 @@ export default function ThemeSelectorModal({
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          if (confirm(`Delete "${theme.name}"?`)) {
-                            setCustomThemes(customThemes.filter((t) => t.id !== theme.id))
-                            if (currentTheme === theme.id) {
-                              setCurrentTheme('routine-ready')
-                            }
-                          }
+                          setConfirmState({
+                            title: 'Delete Theme',
+                            message: `Delete "${theme.name}"?`,
+                            confirmLabel: 'Delete',
+                            confirmStyle: 'danger',
+                            onConfirm: () => {
+                              setConfirmState(null)
+                              setCustomThemes(customThemes.filter((t) => t.id !== theme.id))
+                              if (currentTheme === theme.id) {
+                                setCurrentTheme('routine-ready')
+                              }
+                            },
+                          })
                         }}
                         className="p-2 text-brand-error hover:bg-red-50 rounded-[6px] cursor-pointer"
                         aria-label={`Delete ${theme.name}`}
@@ -156,6 +167,17 @@ export default function ThemeSelectorModal({
           Create Custom Theme
         </button>
       </div>
+
+      {confirmState && (
+        <ConfirmModal
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmLabel={confirmState.confirmLabel}
+          confirmStyle={confirmState.confirmStyle}
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(null)}
+        />
+      )}
     </div>
   )
 }

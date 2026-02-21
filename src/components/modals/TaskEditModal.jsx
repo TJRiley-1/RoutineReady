@@ -1,14 +1,39 @@
+import { useState } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { iconLibrary, getIconComponent } from '../../data/iconLibrary'
 import { readFileAsDataURL } from '../../lib/timeUtils'
+import ConfirmModal from './ConfirmModal'
+import Notification from '../ui/Notification'
 
 export default function TaskEditModal({ editingTask, setEditingTask, onSave, onCancel }) {
+  const [notification, setNotification] = useState(null)
+  const [confirmState, setConfirmState] = useState(null)
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="task-edit-title">
       <div className="bg-white rounded-[16px] shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-brand-border p-6 z-10 rounded-t-[16px]">
           <h2 id="task-edit-title" className="text-2xl font-bold text-brand-text">Edit Task</h2>
         </div>
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onDismiss={() => setNotification(null)}
+          />
+        )}
+
+        {confirmState && (
+          <ConfirmModal
+            title={confirmState.title}
+            message={confirmState.message}
+            confirmLabel={confirmState.confirmLabel}
+            confirmStyle={confirmState.confirmStyle}
+            onConfirm={confirmState.onConfirm}
+            onCancel={() => { setConfirmState(null) }}
+          />
+        )}
 
         <div className="p-6 space-y-6">
           {/* Task Name */}
@@ -128,23 +153,36 @@ export default function TaskEditModal({ editingTask, setEditingTask, onSave, onC
                         const warningSize = 500 * 1024
 
                         if (file.size > maxSize) {
-                          alert(
-                            `Image is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Please use an image smaller than 2MB.`
-                          )
+                          setNotification({
+                            message: `Image is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Please use an image smaller than 2MB.`,
+                            type: 'error',
+                          })
                           e.target.value = ''
                           return
                         }
 
                         if (file.size > warningSize) {
                           const sizeInKB = (file.size / 1024).toFixed(0)
-                          if (
-                            !confirm(
-                              `This image is ${sizeInKB}KB. Large images may slow down the app. Consider using a smaller image for better performance. Continue anyway?`
-                            )
-                          ) {
-                            e.target.value = ''
-                            return
-                          }
+                          const pendingFile = file
+                          const fileInput = e.target
+                          setConfirmState({
+                            title: 'Large Image',
+                            message: `This image is ${sizeInKB}KB. Large images may slow down the app. Consider using a smaller image for better performance. Continue anyway?`,
+                            confirmLabel: 'Continue',
+                            confirmStyle: 'primary',
+                            onConfirm: () => {
+                              setConfirmState(null)
+                              readFileAsDataURL(pendingFile, (dataUrl) => {
+                                setEditingTask((prev) => ({
+                                  ...prev,
+                                  imageUrl: dataUrl,
+                                  type: 'image',
+                                }))
+                              })
+                            },
+                          })
+                          fileInput.value = ''
+                          return
                         }
 
                         readFileAsDataURL(file, (dataUrl) => {

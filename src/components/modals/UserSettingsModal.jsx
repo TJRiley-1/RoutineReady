@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Edit, Upload, RefreshCw, LogOut, User, KeyRound } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import Notification from '../ui/Notification'
 
 export default function UserSettingsModal({
   setupData,
@@ -18,6 +19,7 @@ export default function UserSettingsModal({
   const [nameSaved, setNameSaved] = useState(false)
   const [resetSending, setResetSending] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [notification, setNotification] = useState(null)
 
   const userEmail = session?.user?.email || ''
 
@@ -28,7 +30,7 @@ export default function UserSettingsModal({
       setNameSaved(true)
       setTimeout(() => setNameSaved(false), 3000)
     } catch (err) {
-      alert('Failed to save display name: ' + err.message)
+      setNotification({ message: 'Failed to save display name: ' + err.message, type: 'error' })
     } finally {
       setNameSaving(false)
     }
@@ -43,7 +45,7 @@ export default function UserSettingsModal({
       setResetSent(true)
       setTimeout(() => setResetSent(false), 5000)
     } catch (err) {
-      alert('Failed to send password reset email: ' + err.message)
+      setNotification({ message: 'Failed to send password reset email: ' + err.message, type: 'error' })
     } finally {
       setResetSending(false)
     }
@@ -53,6 +55,14 @@ export default function UserSettingsModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="user-settings-title">
       <div className="bg-white rounded-[16px] p-8 w-[480px] shadow-lg max-h-[90vh] overflow-y-auto">
         <h2 id="user-settings-title" className="text-2xl font-bold mb-6 text-brand-text">User Settings</h2>
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onDismiss={() => setNotification(null)}
+          />
+        )}
 
         {/* Account Section */}
         <div className="mb-6">

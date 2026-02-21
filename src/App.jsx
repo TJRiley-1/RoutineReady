@@ -9,9 +9,12 @@ import AuthGate from './components/auth/AuthGate'
 import SetupWizard from './components/setup/SetupWizard'
 import DisplayView from './components/display/DisplayView'
 import AdminPanel from './components/admin/AdminPanel'
+import ConfirmModal from './components/modals/ConfirmModal'
+import Notification from './components/ui/Notification'
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [appConfirm, setAppConfirm] = useState(null)
 
   const { session, signOut } = useAuth()
 
@@ -35,6 +38,10 @@ export default function App() {
     setTodaysTemplateName,
     hasUnsavedChanges,
     isSaving,
+    notification,
+    setNotification,
+    pendingConfirm,
+    setPendingConfirm,
     saveAll,
     updateDisplaySettings,
     updateCurrentTheme,
@@ -73,17 +80,40 @@ export default function App() {
     setIsAdmin(false)
   }
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     if (hasUnsavedChanges) {
-      const choice = confirm(
-        'You have unsaved changes. Press OK to save before signing out, or Cancel to discard changes.'
-      )
-      if (choice) {
-        await saveAll()
-      }
+      setAppConfirm({
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Press Save to save before signing out, or Discard to sign out without saving.',
+        confirmLabel: 'Save & Sign Out',
+        onConfirm: async () => {
+          setAppConfirm(null)
+          await saveAll()
+          appDataSignOut()
+          await signOut()
+        },
+      })
+    } else {
+      appDataSignOut()
+      signOut()
     }
-    appDataSignOut()
-    await signOut()
+  }
+
+  const handleExitAdmin = () => {
+    if (hasUnsavedChanges) {
+      setAppConfirm({
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Press Save to save before leaving, or Discard to leave without saving.',
+        confirmLabel: 'Save & Exit',
+        onConfirm: async () => {
+          setAppConfirm(null)
+          await saveAll()
+          setIsAdmin(false)
+        },
+      })
+    } else {
+      setIsAdmin(false)
+    }
   }
 
   const theme = getActiveTheme(currentTheme, customThemes)
@@ -99,6 +129,48 @@ export default function App() {
 
   return (
     <AuthGate>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onDismiss={() => setNotification(null)}
+        />
+      )}
+
+      {pendingConfirm && (
+        <ConfirmModal
+          title={pendingConfirm.title}
+          message={pendingConfirm.message}
+          confirmLabel={pendingConfirm.confirmLabel}
+          confirmStyle={pendingConfirm.confirmStyle}
+          onConfirm={pendingConfirm.onConfirm}
+          onCancel={() => setPendingConfirm(null)}
+        />
+      )}
+
+      {appConfirm && (
+        <ConfirmModal
+          title={appConfirm.title}
+          message={appConfirm.message}
+          confirmLabel={appConfirm.confirmLabel}
+          confirmStyle={appConfirm.confirmStyle}
+          onConfirm={appConfirm.onConfirm}
+          onCancel={() => {
+            setAppConfirm(null)
+            // For sign-out: discard and proceed; for exit-admin: just close
+            if (appConfirm.title === 'Unsaved Changes') {
+              // The user chose to discard — perform the action without saving
+              if (appConfirm.confirmLabel === 'Save & Sign Out') {
+                appDataSignOut()
+                signOut()
+              } else {
+                setIsAdmin(false)
+              }
+            }
+          }}
+        />
+      )}
+
       {!isAdmin && showSetupWizard ? (
         <SetupWizard
           setupStep={setupStep}
@@ -134,15 +206,7 @@ export default function App() {
           hasUnsavedChanges={hasUnsavedChanges}
           isSaving={isSaving}
           onSave={saveAll}
-          onExitAdmin={async () => {
-            if (hasUnsavedChanges) {
-              const choice = confirm('You have unsaved changes. Press OK to save before leaving, or Cancel to discard changes.')
-              if (choice) {
-                await saveAll()
-              }
-            }
-            setIsAdmin(false)
-          }}
+          onExitAdmin={handleExitAdmin}
           onEditSetup={handleEditSetup}
           onResetSetup={handleResetSetupAndReturn}
           onRestoreBackup={handleRestoreBackup}

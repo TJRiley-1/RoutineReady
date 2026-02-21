@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { X } from 'lucide-react'
 import { presetThemes } from '../../data/presetThemes'
 import { getFontStyle } from '../../lib/themeUtils'
+import Notification from '../ui/Notification'
 
 export default function ThemeEditorModal({
   editingTheme,
@@ -11,9 +13,11 @@ export default function ThemeEditorModal({
   onClose,
   onBackToSelector,
 }) {
+  const [notification, setNotification] = useState(null)
+
   const handleSave = () => {
     if (!editingTheme.name.trim()) {
-      alert('Please enter a theme name')
+      setNotification({ message: 'Please enter a theme name', type: 'warning' })
       return
     }
     const existingIndex = customThemes.findIndex((t) => t.id === editingTheme.id)
@@ -38,6 +42,14 @@ export default function ThemeEditorModal({
             <X className="w-8 h-8" />
           </button>
         </div>
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onDismiss={() => setNotification(null)}
+          />
+        )}
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">

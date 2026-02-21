@@ -4,6 +4,8 @@ import { getIconComponent } from '../../data/iconLibrary'
 import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
 import { calculateEndTime, getDayKey } from '../../lib/timeUtils'
 import { presetThemes } from '../../data/presetThemes'
+import ConfirmModal from '../modals/ConfirmModal'
+import Notification from '../ui/Notification'
 import TransitionIndicator from '../display/TransitionIndicator'
 import { getSpriteEmoji, getSurfaceGradient, getSurfaceDashColor } from '../../data/transitionPresets'
 import TimelineRow from '../display/TimelineRow'
@@ -56,7 +58,8 @@ export default function AdminPanel({
   const [showTaskEditModal, setShowTaskEditModal] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
   const [taskOverflowWarning, setTaskOverflowWarning] = useState(false)
-  const [templateSaveMessage, setTemplateSaveMessage] = useState(false)
+  const [notification, setNotification] = useState(null)
+  const [confirmState, setConfirmState] = useState(null)
   const [draggingTemplate, setDraggingTemplate] = useState(null)
 
   const scrollContainerRef = useRef(null)
@@ -163,8 +166,7 @@ export default function AdminPanel({
       setTemplates([...templates, newTemplate])
       setNewTemplateName('')
       setShowTemplateModal(false)
-      setTemplateSaveMessage(true)
-      setTimeout(() => setTemplateSaveMessage(false), 3000)
+      setNotification({ message: 'Template saved successfully!', type: 'success' })
     }
   }
 
@@ -180,14 +182,21 @@ export default function AdminPanel({
   }
 
   const handleDeleteTemplate = (templateId) => {
-    if (confirm('Delete this template? This cannot be undone.')) {
-      setTemplates(templates.filter((t) => t.id !== templateId))
-      const updatedSchedule = { ...weeklySchedule }
-      Object.keys(updatedSchedule).forEach((day) => {
-        if (updatedSchedule[day] === templateId) updatedSchedule[day] = null
-      })
-      setWeeklySchedule(updatedSchedule)
-    }
+    setConfirmState({
+      title: 'Delete Template',
+      message: 'Delete this template? This cannot be undone.',
+      confirmLabel: 'Delete',
+      confirmStyle: 'danger',
+      onConfirm: () => {
+        setConfirmState(null)
+        setTemplates(templates.filter((t) => t.id !== templateId))
+        const updatedSchedule = { ...weeklySchedule }
+        Object.keys(updatedSchedule).forEach((day) => {
+          if (updatedSchedule[day] === templateId) updatedSchedule[day] = null
+        })
+        setWeeklySchedule(updatedSchedule)
+      },
+    })
   }
 
   const handleSelectTemplateForAssign = (templateId) => {
@@ -304,10 +313,23 @@ export default function AdminPanel({
         </div>
       )}
 
-      {templateSaveMessage && (
-        <div className="bg-brand-primary-bg border-l-4 border-brand-primary text-brand-primary-dark p-4 mx-4 mt-4" role="status">
-          <p className="font-semibold">Template saved successfully!</p>
-        </div>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onDismiss={() => setNotification(null)}
+        />
+      )}
+
+      {confirmState && (
+        <ConfirmModal
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmLabel={confirmState.confirmLabel}
+          confirmStyle={confirmState.confirmStyle}
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(null)}
+        />
       )}
 
       {/* Modals */}

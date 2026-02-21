@@ -44,6 +44,10 @@ export function useAppData(session) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
+  // UI feedback state (replaces browser alert/confirm)
+  const [notification, setNotification] = useState(null)
+  const [pendingConfirm, setPendingConfirm] = useState(null)
+
   // Track whether initial load is done to avoid saving defaults back to DB
   const initialLoadDone = useRef(false)
 
@@ -661,7 +665,7 @@ export function useAppData(session) {
       setHasUnsavedChanges(false)
     } catch (err) {
       console.error('Save failed:', err)
-      alert('Save failed: ' + err.message)
+      setNotification({ message: 'Save failed: ' + err.message, type: 'error' })
     } finally {
       setIsSaving(false)
     }
@@ -744,49 +748,56 @@ export function useAppData(session) {
     const file = event.target.files[0]
     if (!file) return
     if (!file.name.endsWith('.json')) {
-      alert('Please select a valid JSON backup file.')
+      setNotification({ message: 'Please select a valid JSON backup file.', type: 'error' })
       event.target.value = ''
       return
     }
-    if (!confirm('This will replace ALL current data with the backup. Are you sure?')) {
-      event.target.value = ''
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      try {
-        const backupData = JSON.parse(e.target.result)
-        if (!backupData.version || !backupData.exportDate) {
-          throw new Error('Invalid backup file')
+    const fileInput = event.target
+    setPendingConfirm({
+      title: 'Restore Backup',
+      message: 'This will replace ALL current data with the backup. Are you sure?',
+      confirmLabel: 'Restore',
+      confirmStyle: 'danger',
+      onConfirm: () => {
+        setPendingConfirm(null)
+        const reader = new FileReader()
+        reader.onload = async (e) => {
+          try {
+            const backupData = JSON.parse(e.target.result)
+            if (!backupData.version || !backupData.exportDate) {
+              throw new Error('Invalid backup file')
+            }
+
+            if (backupData.taskTemplates) updateTemplates(backupData.taskTemplates)
+            if (backupData.currentTimelineConfig) updateTimelineConfig(backupData.currentTimelineConfig)
+            if (backupData.displaySettings) updateDisplaySettings(backupData.displaySettings)
+            if (backupData.weeklySchedule) updateWeeklySchedule(backupData.weeklySchedule)
+            if (backupData.customThemes) updateCustomThemes(backupData.customThemes)
+            if (backupData.currentTheme) updateCurrentTheme(backupData.currentTheme)
+
+            if (backupData.setupData && schoolId) {
+              const sd = backupData.setupData
+              await supabase.from('schools').update({
+                school_name: sd.schoolName,
+                class_name: sd.className,
+                teacher_name: sd.teacherName,
+                device_name: sd.deviceName,
+              }).eq('id', schoolId)
+              setSetupData(sd)
+            }
+
+            setNotification({
+              message: `Backup restored! Export date: ${new Date(backupData.exportDate).toLocaleString()}`,
+              type: 'success',
+            })
+          } catch (err) {
+            setNotification({ message: 'Failed to restore backup: ' + err.message, type: 'error' })
+          }
+          fileInput.value = ''
         }
-
-        if (backupData.taskTemplates) updateTemplates(backupData.taskTemplates)
-        if (backupData.currentTimelineConfig) updateTimelineConfig(backupData.currentTimelineConfig)
-        if (backupData.displaySettings) updateDisplaySettings(backupData.displaySettings)
-        if (backupData.weeklySchedule) updateWeeklySchedule(backupData.weeklySchedule)
-        if (backupData.customThemes) updateCustomThemes(backupData.customThemes)
-        if (backupData.currentTheme) updateCurrentTheme(backupData.currentTheme)
-
-        if (backupData.setupData && schoolId) {
-          const sd = backupData.setupData
-          await supabase.from('schools').update({
-            school_name: sd.schoolName,
-            class_name: sd.className,
-            teacher_name: sd.teacherName,
-            device_name: sd.deviceName,
-          }).eq('id', schoolId)
-          setSetupData(sd)
-        }
-
-        alert(
-          `Backup restored!\nExport date: ${new Date(backupData.exportDate).toLocaleString()}`
-        )
-      } catch (err) {
-        alert('Failed to restore backup: ' + err.message)
-      }
-      event.target.value = ''
-    }
-    reader.readAsText(file)
+        reader.readAsText(file)
+      },
+    })
   }
 
   // Setup handlers
@@ -805,7 +816,7 @@ export function useAppData(session) {
         .single()
 
       if (error) {
-        alert('Failed to save setup: ' + error.message)
+        setNotification({ message: 'Failed to save setup: ' + error.message, type: 'error' })
         return
       }
 
@@ -863,9 +874,9 @@ export function useAppData(session) {
       })
 
       initialLoadDone.current = true
-      alert('Setup complete! You can now configure your daily schedule.')
+      setNotification({ message: 'Setup complete! You can now configure your daily schedule.', type: 'success' })
     } else {
-      alert('Please complete all required fields.')
+      setNotification({ message: 'Please complete all required fields.', type: 'warning' })
     }
   }
 
@@ -902,36 +913,39 @@ export function useAppData(session) {
     setShowSetupWizard(false)
   }
 
-  const handleResetSetup = async () => {
-    if (
-      confirm(
-        'Are you sure you want to reset to default? This will clear all school information, templates, tasks, and weekly schedule.'
-      )
-    ) {
-      if (schoolId) {
-        await supabase.from('schools').delete().eq('id', schoolId)
-      }
+  const handleResetSetup = () => {
+    setPendingConfirm({
+      title: 'Reset to Default',
+      message: 'Are you sure you want to reset to default? This will clear all school information, templates, tasks, and weekly schedule.',
+      confirmLabel: 'Reset',
+      confirmStyle: 'danger',
+      onConfirm: async () => {
+        setPendingConfirm(null)
+        if (schoolId) {
+          await supabase.from('schools').delete().eq('id', schoolId)
+        }
 
-      setSchoolId(null)
-      setCurrentTheme('routine-ready')
-      setCustomThemes([])
-      setWeeklySchedule(defaultWeeklySchedule)
-      setActiveTemplateId(null)
-      setTodaysTemplateName(null)
-      setTemplates([{
-        ...defaultTemplate,
-        tasks: defaultTasks.map((t) => ({ ...t })),
-      }])
-      setTimelineConfig({
-        ...defaultTimelineConfig,
-        tasks: defaultTasks.map((t) => ({ ...t })),
-      })
-      setDisplaySettings(defaultDisplaySettings)
-      setSetupData(defaultSetupData)
-      setSetupStep(1)
-      setShowSetupWizard(true)
-      initialLoadDone.current = false
-    }
+        setSchoolId(null)
+        setCurrentTheme('routine-ready')
+        setCustomThemes([])
+        setWeeklySchedule(defaultWeeklySchedule)
+        setActiveTemplateId(null)
+        setTodaysTemplateName(null)
+        setTemplates([{
+          ...defaultTemplate,
+          tasks: defaultTasks.map((t) => ({ ...t })),
+        }])
+        setTimelineConfig({
+          ...defaultTimelineConfig,
+          tasks: defaultTasks.map((t) => ({ ...t })),
+        })
+        setDisplaySettings(defaultDisplaySettings)
+        setSetupData(defaultSetupData)
+        setSetupStep(1)
+        setShowSetupWizard(true)
+        initialLoadDone.current = false
+      },
+    })
   }
 
   const handleSignOut = () => {
@@ -962,6 +976,10 @@ export function useAppData(session) {
     setTodaysTemplateName,
     hasUnsavedChanges,
     isSaving,
+    notification,
+    setNotification,
+    pendingConfirm,
+    setPendingConfirm,
     saveAll,
     updateDisplaySettings,
     updateCurrentTheme,
