@@ -428,15 +428,23 @@ export function useAppData(session) {
     }
   })
 
+  // Save templates and return a map of old ID → new ID so weekly schedule references can be updated
   const saveTemplatesToDb = async (allTemplates) => {
-    if (!schoolId) return
-    await supabase.from('templates').delete().eq('school_id', schoolId)
+    if (!schoolId) return {}
+
+    // Delete existing templates (cascade should handle tasks)
+    const { error: deleteError } = await supabase.from('templates').delete().eq('school_id', schoolId)
+    if (deleteError) {
+      console.error('Failed to delete templates:', deleteError)
+      throw new Error('Failed to delete templates: ' + deleteError.message)
+    }
+
+    const idMap = {} // oldId → newId
 
     for (const t of allTemplates) {
-      const { data: newTemplate } = await supabase
+      const { data: newTemplate, error: insertError } = await supabase
         .from('templates')
         .insert({
-          id: t.id,
           school_id: schoolId,
           name: t.name,
           start_time: t.startTime,
@@ -445,8 +453,15 @@ export function useAppData(session) {
         .select()
         .single()
 
-      if (newTemplate && t.tasks?.length > 0) {
-        await supabase.from('tasks').insert(
+      if (insertError || !newTemplate) {
+        console.error('Failed to insert template:', insertError)
+        throw new Error('Failed to save template "' + t.name + '": ' + (insertError?.message || 'unknown error'))
+      }
+
+      idMap[t.id] = newTemplate.id
+
+      if (t.tasks?.length > 0) {
+        const { error: tasksError } = await supabase.from('tasks').insert(
           t.tasks.map((task, i) => ({
             template_id: newTemplate.id,
             sort_order: i,
@@ -459,8 +474,14 @@ export function useAppData(session) {
             height: task.height,
           }))
         )
+        if (tasksError) {
+          console.error('Failed to insert tasks for template:', tasksError)
+          throw new Error('Failed to save tasks for "' + t.name + '": ' + tasksError.message)
+        }
       }
     }
+
+    return idMap
   }
 
   const saveWeeklyScheduleToDb = async (schedule) => {
@@ -474,17 +495,25 @@ export function useAppData(session) {
 
     const payload = {
       school_id: schoolId,
-      monday: schedule.monday,
-      tuesday: schedule.tuesday,
-      wednesday: schedule.wednesday,
-      thursday: schedule.thursday,
-      friday: schedule.friday,
+      monday: schedule.monday || null,
+      tuesday: schedule.tuesday || null,
+      wednesday: schedule.wednesday || null,
+      thursday: schedule.thursday || null,
+      friday: schedule.friday || null,
     }
 
     if (existing) {
-      await supabase.from('weekly_schedules').update(payload).eq('id', existing.id)
+      const { error } = await supabase.from('weekly_schedules').update(payload).eq('id', existing.id)
+      if (error) {
+        console.error('Failed to update weekly schedule:', error)
+        throw new Error('Failed to save weekly schedule: ' + error.message)
+      }
     } else {
-      await supabase.from('weekly_schedules').insert(payload)
+      const { error } = await supabase.from('weekly_schedules').insert(payload)
+      if (error) {
+        console.error('Failed to insert weekly schedule:', error)
+        throw new Error('Failed to save weekly schedule: ' + error.message)
+      }
     }
   }
 
@@ -506,9 +535,11 @@ export function useAppData(session) {
     }
 
     if (existing) {
-      await supabase.from('active_timeline').update(payload).eq('id', existing.id)
+      const { error } = await supabase.from('active_timeline').update(payload).eq('id', existing.id)
+      if (error) console.error('Failed to update active timeline:', error)
     } else {
-      await supabase.from('active_timeline').insert(payload)
+      const { error } = await supabase.from('active_timeline').insert(payload)
+      if (error) console.error('Failed to insert active timeline:', error)
     }
   }
 
@@ -581,15 +612,41 @@ export function useAppData(session) {
     if (!schoolId) return
     setIsSaving(true)
     try {
+      // 1. Save templates first and get old→new ID mapping
+      const idMap = await saveTemplatesToDb(templates)
+
+      // 2. Update local template state with new Supabase IDs
+      const remappedTemplates = templates.map((t) => ({
+        ...t,
+        id: idMap[t.id] || t.id,
+      }))
+      setTemplates(remappedTemplates)
+
+      // 3. Remap weekly schedule references to use new IDs
+      const remappedSchedule = { ...weeklySchedule }
+      for (const day of Object.keys(remappedSchedule)) {
+        if (remappedSchedule[day] && idMap[remappedSchedule[day]]) {
+          remappedSchedule[day] = idMap[remappedSchedule[day]]
+        }
+      }
+      setWeeklySchedule(remappedSchedule)
+
+      // 4. Remap activeTemplateId
+      const newActiveId = activeTemplateId && idMap[activeTemplateId]
+        ? idMap[activeTemplateId]
+        : activeTemplateId
+      setActiveTemplateId(newActiveId)
+
+      // 5. Save weekly schedule and timeline with corrected IDs
       await Promise.all([
-        saveTemplatesToDb(templates),
-        saveWeeklyScheduleToDb(weeklySchedule),
-        saveTimelineConfigToDb(timelineConfig, activeTemplateId),
+        saveWeeklyScheduleToDb(remappedSchedule),
+        saveTimelineConfigToDb(timelineConfig, newActiveId),
       ])
+
       setHasUnsavedChanges(false)
     } catch (err) {
       console.error('Save failed:', err)
-      throw err
+      alert('Save failed: ' + err.message)
     } finally {
       setIsSaving(false)
     }

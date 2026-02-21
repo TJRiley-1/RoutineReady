@@ -79,12 +79,7 @@ export default function App() {
         'You have unsaved changes. Press OK to save before signing out, or Cancel to discard changes.'
       )
       if (choice) {
-        try {
-          await saveAll()
-        } catch {
-          alert('Save failed. Please try again.')
-          return
-        }
+        await saveAll()
       }
     }
     appDataSignOut()
@@ -142,7 +137,7 @@ export default function App() {
             if (hasUnsavedChanges) {
               const choice = confirm('You have unsaved changes. Press OK to save before leaving, or Cancel to discard changes.')
               if (choice) {
-                try { await saveAll() } catch { alert('Save failed. Please try again.'); return }
+                await saveAll()
               }
             }
             setIsAdmin(false)
