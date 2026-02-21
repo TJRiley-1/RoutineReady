@@ -38,7 +38,7 @@ export default function SetupWizard({
             <img src="/logos/RoutineReady_Logo_Stacked_Colour.svg" alt="Routine Ready" className="h-28 mx-auto mb-6" />
             <h1 className="text-4xl font-bold text-brand-text mb-4">Welcome to Routine Ready</h1>
             <p className="text-xl text-brand-text-muted mb-8">
-              Let's set up your display in just a few steps. This will help personalize the system
+              Let's set up your display in just a few steps. This will help personalise the system
               for your classroom.
             </p>
             <div className="flex gap-4 justify-center">
@@ -71,7 +71,7 @@ export default function SetupWizard({
                 <input
                   id="setup-school"
                   type="text"
-                  placeholder="e.g., Riverside Elementary School"
+                  placeholder="e.g., Riverside Primary School"
                   value={setupData.schoolName}
                   onChange={(e) => setSetupData({ ...setupData, schoolName: e.target.value })}
                   className="w-full p-3 h-[44px] border-2 border-brand-border rounded-[6px] text-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary-pale focus:outline-none"

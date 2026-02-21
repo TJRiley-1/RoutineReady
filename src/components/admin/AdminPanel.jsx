@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef } from 'react'
-import { LogOut, Plus, Clock, Edit2, Trash2, Save } from 'lucide-react'
+import { LogOut, Plus, Clock, Edit2, Trash2, Save, BookmarkPlus, Monitor, Palette, Settings, ArrowLeft } from 'lucide-react'
 import { getIconComponent } from '../../data/iconLibrary'
 import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
 import { calculateEndTime, getDayKey } from '../../lib/timeUtils'
@@ -256,11 +256,14 @@ export default function AdminPanel({
             <Save className="w-5 h-5" />
             {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
           </button>
-          <button onClick={() => setShowTemplateModal(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold">Save as Template</button>
-          <button onClick={() => setShowDisplaySettings(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold">Display Settings</button>
-          <button onClick={() => setShowThemeSelector(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-accent text-brand-primary-dark rounded-[6px] hover:bg-brand-accent-light font-semibold">
-            <span className="text-lg">{getThemeEmoji(currentTheme, customThemes)}</span>
-            <span>Change Theme</span>
+          <button onClick={() => setShowTemplateModal(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold transition-colors">
+            <BookmarkPlus className="w-5 h-5" />Save as Template
+          </button>
+          <button onClick={() => setShowDisplaySettings(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold transition-colors">
+            <Monitor className="w-5 h-5" />Display Settings
+          </button>
+          <button onClick={() => setShowThemeSelector(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold transition-colors">
+            <Palette className="w-5 h-5" />Change Theme
           </button>
         </div>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
@@ -270,11 +273,13 @@ export default function AdminPanel({
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowSetupInfoMenu(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold">Setup Info</button>
-          <button onClick={onExitAdmin} className="flex items-center gap-2 bg-brand-error text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-red-600 font-semibold">
-            <LogOut className="w-5 h-5" />Exit Admin
+          <button onClick={() => setShowSetupInfoMenu(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
+            <Settings className="w-5 h-5" />Setup Info
           </button>
-          <button onClick={onSignOut} className="flex items-center gap-2 bg-gray-700 text-white px-5 min-h-[44px] py-3 rounded-[6px] hover:bg-gray-800 font-semibold">
+          <button onClick={onExitAdmin} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
+            <ArrowLeft className="w-5 h-5" />Exit Admin
+          </button>
+          <button onClick={onSignOut} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
             <LogOut className="w-5 h-5" />Sign Out
           </button>
         </div>
