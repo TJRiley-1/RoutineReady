@@ -1,17 +1,18 @@
 import { Fragment, useState, useRef } from 'react'
-import { LogOut, Plus, Clock, Edit2, Trash2, Save, BookmarkPlus, Monitor, Palette, Settings, ArrowLeft } from 'lucide-react'
+import { Plus, Clock, Edit2, Trash2, Save, BookmarkPlus, Monitor, Palette, Settings, ArrowLeft } from 'lucide-react'
 import { getIconComponent } from '../../data/iconLibrary'
 import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
 import { calculateEndTime, getDayKey } from '../../lib/timeUtils'
 import { presetThemes } from '../../data/presetThemes'
 import TransitionIndicator from '../display/TransitionIndicator'
+import { getSpriteEmoji, getSurfaceGradient, getSurfaceDashColor } from '../../data/transitionPresets'
 import TimelineRow from '../display/TimelineRow'
 import DisplaySettingsModal from '../modals/DisplaySettingsModal'
 import TemplateModal from '../modals/TemplateModal'
 import ThemeSelectorModal from '../modals/ThemeSelectorModal'
 import ThemeEditorModal from '../modals/ThemeEditorModal'
 import TaskEditModal from '../modals/TaskEditModal'
-import SetupInfoModal from '../modals/SetupInfoModal'
+import UserSettingsModal from '../modals/UserSettingsModal'
 
 export default function AdminPanel({
   timelineConfig,
@@ -23,6 +24,7 @@ export default function AdminPanel({
   weeklySchedule,
   setWeeklySchedule,
   setupData,
+  session,
   currentTheme,
   setCurrentTheme,
   customThemes,
@@ -50,10 +52,11 @@ export default function AdminPanel({
   const [showThemeSelector, setShowThemeSelector] = useState(false)
   const [showThemeEditor, setShowThemeEditor] = useState(false)
   const [editingTheme, setEditingTheme] = useState(null)
-  const [showSetupInfoMenu, setShowSetupInfoMenu] = useState(false)
+  const [showUserSettings, setShowUserSettings] = useState(false)
   const [showTaskEditModal, setShowTaskEditModal] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
   const [taskOverflowWarning, setTaskOverflowWarning] = useState(false)
+  const [templateSaveMessage, setTemplateSaveMessage] = useState(false)
   const [draggingTemplate, setDraggingTemplate] = useState(null)
 
   const scrollContainerRef = useRef(null)
@@ -65,6 +68,7 @@ export default function AdminPanel({
   const scaleFactor = displaySettings.scale / 100
 
   const getMaxTasksForDisplay = () => {
+    if (displaySettings.mode === 'auto-pan') return Infinity
     const availableWidth = displaySettings.width - 100
     const startEndWidth = 140 + 24
     let remainingWidth = availableWidth - startEndWidth * 2
@@ -159,7 +163,8 @@ export default function AdminPanel({
       setTemplates([...templates, newTemplate])
       setNewTemplateName('')
       setShowTemplateModal(false)
-      alert('Template saved successfully!')
+      setTemplateSaveMessage(true)
+      setTimeout(() => setTemplateSaveMessage(false), 3000)
     }
   }
 
@@ -273,14 +278,11 @@ export default function AdminPanel({
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowSetupInfoMenu(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
-            <Settings className="w-5 h-5" />Setup Info
+          <button onClick={() => setShowUserSettings(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
+            <Settings className="w-5 h-5" />User Settings
           </button>
           <button onClick={onExitAdmin} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
             <ArrowLeft className="w-5 h-5" />Exit Admin
-          </button>
-          <button onClick={onSignOut} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold transition-colors">
-            <LogOut className="w-5 h-5" />Sign Out
           </button>
         </div>
       </header>
@@ -302,14 +304,22 @@ export default function AdminPanel({
         </div>
       )}
 
+      {templateSaveMessage && (
+        <div className="bg-brand-primary-bg border-l-4 border-brand-primary text-brand-primary-dark p-4 mx-4 mt-4" role="status">
+          <p className="font-semibold">Template saved successfully!</p>
+        </div>
+      )}
+
       {/* Modals */}
-      {showSetupInfoMenu && (
-        <SetupInfoModal
+      {showUserSettings && (
+        <UserSettingsModal
           setupData={setupData}
-          onEditSetup={() => { setShowSetupInfoMenu(false); onEditSetup() }}
-          onResetSetup={() => { setShowSetupInfoMenu(false); onResetSetup() }}
-          onRestoreBackup={(e) => { setShowSetupInfoMenu(false); onRestoreBackup(e) }}
-          onClose={() => setShowSetupInfoMenu(false)}
+          session={session}
+          onEditSetup={() => { setShowUserSettings(false); onEditSetup() }}
+          onResetSetup={() => { setShowUserSettings(false); onResetSetup() }}
+          onRestoreBackup={(e) => { setShowUserSettings(false); onRestoreBackup(e) }}
+          onSignOut={() => { setShowUserSettings(false); onSignOut() }}
+          onClose={() => setShowUserSettings(false)}
         />
       )}
       {showDisplaySettings && (
@@ -459,11 +469,11 @@ export default function AdminPanel({
                     <div className="flex flex-col items-center justify-center bg-brand-bg-subtle rounded-[12px] p-4">
                       <div className="text-xs text-brand-text-muted mb-2 font-medium">Transition Preview</div>
                       {displaySettings.transitionType === 'mascot' ? (
-                        <div className="w-full h-8 bg-gray-400 rounded-full relative overflow-hidden">
+                        <div className="w-full h-8 rounded-full relative overflow-hidden" style={{ background: getSurfaceGradient(displaySettings.selectedSurface || 'ice') }}>
                           <div className="absolute inset-0 flex items-center justify-around">
-                            {Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-3 h-0.5 bg-white rounded-full" />))}
+                            {Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-3 h-0.5 rounded-full" style={{ backgroundColor: getSurfaceDashColor(displaySettings.selectedSurface || 'ice') }} />))}
                           </div>
-                          <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xl">🚗</div>
+                          <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xl">{displaySettings.mascotImage ? <img src={displaySettings.mascotImage} alt="Sprite" className="w-6 h-6 object-contain" /> : getSpriteEmoji(displaySettings.selectedSprite || 'penguin')}</div>
                         </div>
                       ) : (
                         <div className="w-full h-3 bg-brand-border rounded-full relative overflow-hidden">
@@ -558,7 +568,7 @@ function PreviewHorizontal({ timelineConfig, displaySettings, theme, currentTask
                 )}
                 <div className="text-gray-600" style={{ fontSize: `${Math.min(taskWidth / 10, 20)}px` }}>{task.duration} min</div>
               </div>
-              <TransitionIndicator transitionType={displaySettings.transitionType} taskDuration={task.duration} elapsed={elapsedInTask} isPast={isPastTask} isActive={isCurrentTask} mascotImage={displaySettings.mascotImage} width={transitionWidth} theme={theme} />
+              <TransitionIndicator transitionType={displaySettings.transitionType} taskDuration={task.duration} elapsed={elapsedInTask} isPast={isPastTask} isActive={isCurrentTask} mascotImage={displaySettings.mascotImage} width={transitionWidth} theme={theme} selectedSprite={displaySettings.selectedSprite} selectedSurface={displaySettings.selectedSurface} roadHeight={displaySettings.roadHeight} />
             </Fragment>
           )
         })}
@@ -581,7 +591,7 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
     <div className="w-full h-full flex flex-col">
       {(displaySettings.topBannerImage || displaySettings.showClock) && (
         <div className="flex items-center justify-center py-2 bg-gradient-to-r from-brand-primary to-brand-primary-dark">
-          {displaySettings.topBannerImage && <img src={displaySettings.topBannerImage} alt="Top Banner" className="max-h-12 object-contain" />}
+          {displaySettings.topBannerImage && <img src={displaySettings.topBannerImage} alt="Top Banner" style={{ height: `${displaySettings.topBannerHeight || 48}px`, objectFit: 'contain' }} />}
           {displaySettings.showClock && <div className="text-2xl font-bold text-white ml-4">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>}
         </div>
       )}
@@ -600,8 +610,8 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
             ) : <div className="text-sm text-gray-500">No current task</div>}
           </div>
           <div className="flex flex-col items-center justify-center" style={{ flex: '3' }}>
-            <TransitionIndicator transitionType={displaySettings.transitionType} taskDuration={currentTask?.duration || 30} elapsed={elapsedInTask} isPast={false} isActive={true} mascotImage={displaySettings.mascotImage} width={displaySettings.width * scaleFactor * 0.5} theme={theme} />
-            <div className="mt-4 text-lg font-bold text-gray-700">{Math.max(0, Math.floor((currentTask?.duration || 0) - elapsedInTask))} min remaining</div>
+            <TransitionIndicator transitionType={displaySettings.transitionType} taskDuration={currentTask?.duration || 30} elapsed={elapsedInTask} isPast={false} isActive={true} mascotImage={displaySettings.mascotImage} width={displaySettings.width * scaleFactor * 0.5} theme={theme} selectedSprite={displaySettings.selectedSprite} selectedSurface={displaySettings.selectedSurface} roadHeight={displaySettings.roadHeight} />
+            <div className="mt-4 text-lg font-bold text-gray-700">{Math.max(0, Math.floor((currentTask?.duration || 0) - elapsedInTask))} Minute Remaining</div>
           </div>
           <div className="flex flex-col items-center justify-center rounded-xl shadow-lg p-4 bg-white border-2 border-gray-300" style={{ flex: '1' }}>
             {nextTask ? (
@@ -619,7 +629,7 @@ function PreviewAutoPan({ timelineConfig, displaySettings, theme, currentTaskInd
       </div>
       {displaySettings.bottomBannerImage && (
         <div className="flex items-center justify-center py-2 bg-gradient-to-r from-brand-primary-dark to-brand-primary">
-          <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" className="max-h-12 object-contain" />
+          <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" style={{ height: `${displaySettings.bottomBannerHeight || 48}px`, objectFit: 'contain' }} />
         </div>
       )}
     </div>

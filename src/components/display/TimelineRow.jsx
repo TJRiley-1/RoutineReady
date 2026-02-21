@@ -119,6 +119,9 @@ export default function TimelineRow({
               mascotImage={displaySettings.mascotImage}
               width={transitionWidth}
               theme={theme}
+              selectedSprite={displaySettings.selectedSprite}
+              selectedSurface={displaySettings.selectedSurface}
+              roadHeight={displaySettings.roadHeight}
             />
           </Fragment>
         )

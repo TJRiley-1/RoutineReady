@@ -48,9 +48,14 @@ export const defaultDisplaySettings = {
   transitionType: 'progress-line',
   mascotImage: null,
   topBannerImage: null,
+  topBannerHeight: 48,
   bottomBannerImage: null,
+  bottomBannerHeight: 48,
   showClock: false,
   autoPanTileHeight: 60,
+  selectedSprite: 'penguin',
+  selectedSurface: 'ice',
+  roadHeight: 32,
 }
 
 export const defaultWeeklySchedule = {

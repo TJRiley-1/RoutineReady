@@ -119,6 +119,7 @@ export default function App() {
           weeklySchedule={weeklySchedule}
           setWeeklySchedule={updateWeeklySchedule}
           setupData={setupData || defaultSetupData}
+          session={session}
           currentTheme={currentTheme}
           setCurrentTheme={updateCurrentTheme}
           customThemes={customThemes}

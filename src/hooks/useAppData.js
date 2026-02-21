@@ -131,9 +131,14 @@ export function useAppData(session) {
         transitionType: ds.transition_type,
         mascotImage: ds.mascot_image,
         topBannerImage: ds.top_banner_image,
+        topBannerHeight: ds.top_banner_height ?? 48,
         bottomBannerImage: ds.bottom_banner_image,
+        bottomBannerHeight: ds.bottom_banner_height ?? 48,
         showClock: ds.show_clock,
         autoPanTileHeight: ds.auto_pan_tile_height,
+        selectedSprite: ds.selected_sprite || 'penguin',
+        selectedSurface: ds.selected_surface || 'ice',
+        roadHeight: ds.road_height ?? 32,
       })
       setCurrentTheme(ds.current_theme || 'routine-ready')
     }
@@ -262,9 +267,14 @@ export function useAppData(session) {
         transition_type: ds.transitionType,
         mascot_image: ds.mascotImage,
         top_banner_image: ds.topBannerImage,
+        top_banner_height: ds.topBannerHeight || 48,
         bottom_banner_image: ds.bottomBannerImage,
+        bottom_banner_height: ds.bottomBannerHeight || 48,
         show_clock: ds.showClock,
         auto_pan_tile_height: ds.autoPanTileHeight,
+        selected_sprite: ds.selectedSprite || 'penguin',
+        selected_surface: ds.selectedSurface || 'ice',
+        road_height: ds.roadHeight || 32,
         current_theme: localStorage.getItem('currentTheme') || 'routine-ready',
       })
     }
@@ -391,9 +401,14 @@ export function useAppData(session) {
       transition_type: settings.transitionType,
       mascot_image: settings.mascotImage,
       top_banner_image: settings.topBannerImage,
+      top_banner_height: settings.topBannerHeight,
       bottom_banner_image: settings.bottomBannerImage,
+      bottom_banner_height: settings.bottomBannerHeight,
       show_clock: settings.showClock,
       auto_pan_tile_height: settings.autoPanTileHeight,
+      selected_sprite: settings.selectedSprite,
+      selected_surface: settings.selectedSurface,
+      road_height: settings.roadHeight,
       current_theme: theme,
     }
 

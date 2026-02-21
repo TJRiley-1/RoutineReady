@@ -174,6 +174,9 @@ function HorizontalTimeline({ timelineConfig, displaySettings, theme, currentTas
               mascotImage={displaySettings.mascotImage}
               width={transitionWidth}
               theme={theme}
+              selectedSprite={displaySettings.selectedSprite}
+              selectedSurface={displaySettings.selectedSurface}
+              roadHeight={displaySettings.roadHeight}
             />
           </Fragment>
         )
@@ -239,7 +242,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
       {(displaySettings.topBannerImage || displaySettings.showClock) && (
         <div className="flex items-center justify-center py-4" style={{ background: `linear-gradient(to right, ${theme.cardBorderColor}, ${theme.cardBorderColorAlt || theme.cardBorderColor})` }}>
           {displaySettings.topBannerImage && (
-            <img src={displaySettings.topBannerImage} alt="Top Banner" className="max-h-20 object-contain" />
+            <img src={displaySettings.topBannerImage} alt="Top Banner" style={{ height: `${displaySettings.topBannerHeight || 48}px`, objectFit: 'contain' }} />
           )}
           {displaySettings.showClock && (
             <div className="text-4xl font-bold text-white ml-8">
@@ -305,9 +308,12 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
               mascotImage={displaySettings.mascotImage}
               width={displaySettings.width * 0.5}
               theme={theme}
+              selectedSprite={displaySettings.selectedSprite}
+              selectedSurface={displaySettings.selectedSurface}
+              roadHeight={displaySettings.roadHeight}
             />
             <div className="mt-8 text-3xl font-bold text-gray-700">
-              {Math.max(0, Math.floor((currentTask?.duration || 0) - elapsedInTask))} min remaining
+              {Math.max(0, Math.floor((currentTask?.duration || 0) - elapsedInTask))} Minute Remaining
             </div>
           </div>
 
@@ -350,7 +356,7 @@ function AutoPanTimeline({ timelineConfig, displaySettings, theme, currentTaskIn
       {/* Bottom Banner */}
       {displaySettings.bottomBannerImage && (
         <div className="flex items-center justify-center py-4" style={{ background: `linear-gradient(to right, ${theme.cardBorderColorAlt || theme.cardBorderColor}, ${theme.cardBorderColor})` }}>
-          <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" className="max-h-20 object-contain" />
+          <img src={displaySettings.bottomBannerImage} alt="Bottom Banner" style={{ height: `${displaySettings.bottomBannerHeight || 48}px`, objectFit: 'contain' }} />
         </div>
       )}
     </div>

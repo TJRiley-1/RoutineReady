@@ -1,4 +1,5 @@
 import { readFileAsDataURL } from '../../lib/timeUtils'
+import { spritePresets, surfacePresets, getSurfaceGradient, getSurfaceDashColor } from '../../data/transitionPresets'
 
 export default function DisplaySettingsModal({
   displaySettings,
@@ -108,35 +109,117 @@ export default function DisplaySettingsModal({
                 }
                 className={`p-4 border-2 rounded-[6px] ${displaySettings.transitionType === 'mascot' ? 'border-brand-primary bg-brand-primary-bg' : 'border-brand-border'}`}
               >
-                <div className="font-bold">Road with Mascot</div>
-                <div className="text-xs text-brand-text-muted">Character travels along a road</div>
+                <div className="font-bold">Road with Sprite</div>
+                <div className="text-xs text-brand-text-muted">Character travels along a surface</div>
               </button>
             </div>
           </div>
 
-          {/* Mascot Upload */}
+          {/* Sprite & Surface settings for mascot mode */}
           {displaySettings.transitionType === 'mascot' && (
-            <div>
-              <label className="block text-sm font-medium text-brand-text mb-2">
-                Upload Class Mascot Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleMascotUpload}
-                className="w-full p-3 border-2 border-brand-border rounded-[6px]"
-              />
-              {displaySettings.mascotImage && (
-                <div className="mt-2">
-                  <img
-                    src={displaySettings.mascotImage}
-                    alt="Mascot"
-                    className="w-16 h-16 object-contain"
-                  />
+            <>
+              {/* Transition Sprite */}
+              <div>
+                <label className="block text-sm font-medium text-brand-text mb-2">
+                  Transition Sprite
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {spritePresets.map((sprite) => (
+                    <button
+                      key={sprite.id}
+                      onClick={() =>
+                        setDisplaySettings({ ...displaySettings, selectedSprite: sprite.id, mascotImage: null })
+                      }
+                      className={`p-3 border-2 rounded-[6px] flex flex-col items-center gap-1 ${
+                        displaySettings.selectedSprite === sprite.id && !displaySettings.mascotImage
+                          ? 'border-brand-primary bg-brand-primary-bg'
+                          : 'border-brand-border hover:border-brand-primary'
+                      }`}
+                    >
+                      <span className="text-2xl">{sprite.emoji}</span>
+                      <span className="text-xs text-brand-text-muted">{sprite.label}</span>
+                    </button>
+                  ))}
                 </div>
-              )}
-              <p className="text-xs text-brand-text-muted mt-1">Default: 🚗 (car emoji)</p>
-            </div>
+              </div>
+
+              {/* Upload Sprite Image */}
+              <div>
+                <label className="block text-sm font-medium text-brand-text mb-2">
+                  Upload Sprite Image (Optional)
+                </label>
+                <input
+                  type="file"
+                  accept="image/png,image/svg+xml,image/gif"
+                  onChange={handleMascotUpload}
+                  className="w-full p-3 border-2 border-brand-border rounded-[6px]"
+                />
+                {displaySettings.mascotImage && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <img
+                      src={displaySettings.mascotImage}
+                      alt="Custom Sprite"
+                      className="w-10 h-10 object-contain"
+                    />
+                    <button
+                      onClick={() =>
+                        setDisplaySettings({ ...displaySettings, mascotImage: null })
+                      }
+                      className="px-2 py-1 bg-brand-error text-white text-xs rounded-[6px] hover:bg-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+                <p className="text-xs text-brand-text-muted mt-1">PNG/SVG/GIF recommended at 40x40px. Overrides emoji sprite.</p>
+              </div>
+
+              {/* Progress Bar Surface */}
+              <div>
+                <label className="block text-sm font-medium text-brand-text mb-2">
+                  Progress Bar Surface
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {surfacePresets.map((surface) => (
+                    <button
+                      key={surface.id}
+                      onClick={() =>
+                        setDisplaySettings({ ...displaySettings, selectedSurface: surface.id })
+                      }
+                      className={`p-3 border-2 rounded-[6px] flex flex-col items-center gap-1 ${
+                        displaySettings.selectedSurface === surface.id
+                          ? 'border-brand-primary bg-brand-primary-bg'
+                          : 'border-brand-border hover:border-brand-primary'
+                      }`}
+                    >
+                      <div
+                        className="w-full h-4 rounded-full"
+                        style={{ background: surface.gradient }}
+                      />
+                      <span className="text-xs text-brand-text-muted">{surface.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Progress Bar Height */}
+              <div>
+                <label className="block text-sm font-medium text-brand-text mb-2">
+                  Progress Bar Height: {displaySettings.roadHeight || 32}px
+                </label>
+                <input
+                  type="range"
+                  value={displaySettings.roadHeight || 32}
+                  onChange={(e) =>
+                    setDisplaySettings({ ...displaySettings, roadHeight: parseInt(e.target.value) })
+                  }
+                  className="w-full"
+                  min="24"
+                  max="64"
+                  step="4"
+                />
+              </div>
+            </>
           )}
 
           {/* Auto-Pan settings */}
@@ -175,6 +258,24 @@ export default function DisplaySettingsModal({
                   </div>
                 )}
                 <p className="text-xs text-brand-text-muted mt-1">Good for school logos or class names</p>
+                {displaySettings.topBannerImage && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-brand-text mb-2">
+                      Top Banner Height: {displaySettings.topBannerHeight || 48}px
+                    </label>
+                    <input
+                      type="range"
+                      value={displaySettings.topBannerHeight || 48}
+                      onChange={(e) =>
+                        setDisplaySettings({ ...displaySettings, topBannerHeight: parseInt(e.target.value) })
+                      }
+                      className="w-full"
+                      min="32"
+                      max="120"
+                      step="4"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -212,6 +313,24 @@ export default function DisplaySettingsModal({
                 <p className="text-xs text-brand-text-muted mt-1">
                   Good for decorative images or additional info
                 </p>
+                {displaySettings.bottomBannerImage && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-brand-text mb-2">
+                      Bottom Banner Height: {displaySettings.bottomBannerHeight || 48}px
+                    </label>
+                    <input
+                      type="range"
+                      value={displaySettings.bottomBannerHeight || 48}
+                      onChange={(e) =>
+                        setDisplaySettings({ ...displaySettings, bottomBannerHeight: parseInt(e.target.value) })
+                      }
+                      className="w-full"
+                      min="32"
+                      max="120"
+                      step="4"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -340,7 +459,7 @@ export default function DisplaySettingsModal({
             <div className="text-sm font-medium text-brand-text mb-2">Display Capacity:</div>
             <div className="text-sm text-brand-text-muted">
               <div>
-                <strong>Max Tasks:</strong> {maxTasks} tasks
+                <strong>Max Tasks:</strong> {maxTasks === Infinity ? 'Unlimited (auto-pan)' : `${maxTasks} tasks`}
               </div>
               <div>
                 <strong>Current Tasks:</strong> {taskCount} tasks
