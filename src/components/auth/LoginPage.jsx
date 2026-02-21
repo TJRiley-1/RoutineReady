@@ -27,7 +27,7 @@ export default function LoginPage() {
     <div className="w-full h-screen bg-gradient-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center">
       <div className="bg-white rounded-[16px] shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-6">
-          <img src="/logos/RoutineReady_Logo_Stacked_Colour.svg" alt="Routine Ready" className="h-24 mx-auto mb-4" />
+          <img src="/logos/RoutineReady_Logo_Stacked_Colour.svg" alt="Routine Ready" className="h-40 mx-auto mb-4" />
           <p className="text-brand-text-muted text-sm">Visual routine display for classrooms</p>
         </div>
 
