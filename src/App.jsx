@@ -33,6 +33,9 @@ export default function App() {
     setActiveTemplateId,
     todaysTemplateName,
     setTodaysTemplateName,
+    hasUnsavedChanges,
+    isSaving,
+    saveAll,
     updateDisplaySettings,
     updateCurrentTheme,
     updateTimelineConfig,
@@ -71,6 +74,19 @@ export default function App() {
   }
 
   const handleSignOut = async () => {
+    if (hasUnsavedChanges) {
+      const choice = confirm(
+        'You have unsaved changes. Press OK to save before signing out, or Cancel to discard changes.'
+      )
+      if (choice) {
+        try {
+          await saveAll()
+        } catch {
+          alert('Save failed. Please try again.')
+          return
+        }
+      }
+    }
     appDataSignOut()
     await signOut()
   }
@@ -119,7 +135,18 @@ export default function App() {
           currentTaskIndex={currentTaskIndex}
           elapsedInTask={elapsedInTask}
           currentTime={currentTime}
-          onExitAdmin={() => setIsAdmin(false)}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+          onSave={saveAll}
+          onExitAdmin={async () => {
+            if (hasUnsavedChanges) {
+              const choice = confirm('You have unsaved changes. Press OK to save before leaving, or Cancel to discard changes.')
+              if (choice) {
+                try { await saveAll() } catch { alert('Save failed. Please try again.'); return }
+              }
+            }
+            setIsAdmin(false)
+          }}
           onEditSetup={handleEditSetup}
           onResetSetup={handleResetSetupAndReturn}
           onRestoreBackup={handleRestoreBackup}

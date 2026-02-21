@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef } from 'react'
-import { LogOut, Plus, Clock, Edit2, Trash2 } from 'lucide-react'
+import { LogOut, Plus, Clock, Edit2, Trash2, Save } from 'lucide-react'
 import { getIconComponent } from '../../data/iconLibrary'
 import { getActiveTheme, getThemeEmoji, getFontStyle, getBackgroundStyle } from '../../lib/themeUtils'
 import { calculateEndTime, getDayKey } from '../../lib/timeUtils'
@@ -34,6 +34,9 @@ export default function AdminPanel({
   currentTaskIndex,
   elapsedInTask,
   currentTime,
+  hasUnsavedChanges,
+  isSaving,
+  onSave,
   onExitAdmin,
   onEditSetup,
   onResetSetup,
@@ -241,6 +244,18 @@ export default function AdminPanel({
       {/* Toolbar */}
       <header className="bg-white shadow-lg p-4 flex items-center justify-between sticky top-0 z-20 relative">
         <div className="flex items-center gap-3">
+          <button
+            onClick={onSave}
+            disabled={isSaving || !hasUnsavedChanges}
+            className={`flex items-center gap-2 px-5 min-h-[44px] py-3 rounded-[6px] font-semibold transition-all ${
+              hasUnsavedChanges
+                ? 'bg-brand-accent text-brand-primary-dark hover:bg-brand-accent-light animate-pulse'
+                : 'bg-gray-200 text-gray-500 cursor-default'
+            }`}
+          >
+            <Save className="w-5 h-5" />
+            {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
+          </button>
           <button onClick={() => setShowTemplateModal(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-primary text-white rounded-[6px] hover:bg-brand-primary-dark font-semibold">Save as Template</button>
           <button onClick={() => setShowDisplaySettings(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-bg-subtle text-brand-text border border-brand-border rounded-[6px] hover:bg-gray-200 font-semibold">Display Settings</button>
           <button onClick={() => setShowThemeSelector(true)} className="flex items-center gap-2 px-5 min-h-[44px] py-3 bg-brand-accent text-brand-primary-dark rounded-[6px] hover:bg-brand-accent-light font-semibold">
@@ -264,6 +279,16 @@ export default function AdminPanel({
           </button>
         </div>
       </header>
+
+      {hasUnsavedChanges && (
+        <div className="bg-amber-50 border-l-4 border-brand-accent text-amber-800 p-4 mx-4 mt-4 flex items-center justify-between" role="status">
+          <p className="font-semibold">You have unsaved changes. Click "Save Changes" to save your templates and schedule.</p>
+          <button onClick={onSave} disabled={isSaving} className="flex items-center gap-2 px-4 py-2 bg-brand-accent text-brand-primary-dark rounded-[6px] hover:bg-brand-accent-light font-semibold text-sm ml-4 flex-shrink-0">
+            <Save className="w-4 h-4" />
+            {isSaving ? 'Saving...' : 'Save Now'}
+          </button>
+        </div>
+      )}
 
       {taskOverflowWarning && (
         <div className="bg-red-100 border-l-4 border-brand-error text-red-700 p-4 m-4" role="alert">

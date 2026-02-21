@@ -9,37 +9,16 @@ import {
   defaultTasks,
 } from '../data/defaults'
 
-// Debounce helper for saving to Supabase
-// Returns [debouncedFn, flushFn] — call flushFn() to immediately execute any pending save
+// Debounce helper for non-critical saves (display settings, themes)
 function useDebouncedSave(saveFn, delay = 800) {
   const timeoutRef = useRef(null)
   const saveFnRef = useRef(saveFn)
-  const pendingArgsRef = useRef(null)
   saveFnRef.current = saveFn
 
-  const debounced = useCallback((...args) => {
-    pendingArgsRef.current = args
+  return useCallback((...args) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => {
-      pendingArgsRef.current = null
-      saveFnRef.current(...args)
-    }, delay)
+    timeoutRef.current = setTimeout(() => saveFnRef.current(...args), delay)
   }, [delay])
-
-  const flush = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
-    if (pendingArgsRef.current) {
-      const args = pendingArgsRef.current
-      pendingArgsRef.current = null
-      return saveFnRef.current(...args)
-    }
-    return Promise.resolve()
-  }, [])
-
-  return [debounced, flush]
 }
 
 export function useAppData(session) {
@@ -62,6 +41,8 @@ export function useAppData(session) {
   // Non-persisted state
   const [activeTemplateId, setActiveTemplateId] = useState(null)
   const [todaysTemplateName, setTodaysTemplateName] = useState(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Track whether initial load is done to avoid saving defaults back to DB
   const initialLoadDone = useRef(false)
@@ -389,8 +370,8 @@ export function useAppData(session) {
     localStorage.removeItem('displaySettings')
   }
 
-  // --- Debounced Supabase save functions ---
-  const [saveDisplaySettingsToDb, flushDisplaySettings] = useDebouncedSave(async (settings, theme) => {
+  // --- Debounced Supabase save functions (for non-critical, frequent changes) ---
+  const saveDisplaySettingsToDb = useDebouncedSave(async (settings, theme) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('display_settings')
@@ -423,7 +404,7 @@ export function useAppData(session) {
     }
   })
 
-  const [saveTimelineToDb, flushTimeline] = useDebouncedSave(async (config, templateId) => {
+  const saveTimelineToDb = useDebouncedSave(async (config, templateId) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('active_timeline')
@@ -447,7 +428,7 @@ export function useAppData(session) {
     }
   })
 
-  const [saveTemplatesToDb, flushTemplates] = useDebouncedSave(async (allTemplates) => {
+  const saveTemplatesToDb = async (allTemplates) => {
     if (!schoolId) return
     await supabase.from('templates').delete().eq('school_id', schoolId)
 
@@ -480,9 +461,9 @@ export function useAppData(session) {
         )
       }
     }
-  })
+  }
 
-  const [saveWeeklyScheduleToDb, flushWeeklySchedule] = useDebouncedSave(async (schedule) => {
+  const saveWeeklyScheduleToDb = async (schedule) => {
     if (!schoolId) return
     const { data: existing } = await supabase
       .from('weekly_schedules')
@@ -505,9 +486,33 @@ export function useAppData(session) {
     } else {
       await supabase.from('weekly_schedules').insert(payload)
     }
-  })
+  }
 
-  const [saveCustomThemesToDb, flushCustomThemes] = useDebouncedSave(async (themes) => {
+  const saveTimelineConfigToDb = async (config, templateId) => {
+    if (!schoolId) return
+    const { data: existing } = await supabase
+      .from('active_timeline')
+      .select('id')
+      .eq('school_id', schoolId)
+      .limit(1)
+      .single()
+
+    const payload = {
+      school_id: schoolId,
+      template_id: templateId || null,
+      start_time: config.startTime,
+      end_time: config.endTime,
+      tasks_json: config.tasks,
+    }
+
+    if (existing) {
+      await supabase.from('active_timeline').update(payload).eq('id', existing.id)
+    } else {
+      await supabase.from('active_timeline').insert(payload)
+    }
+  }
+
+  const saveCustomThemesToDb = useDebouncedSave(async (themes) => {
     if (!schoolId) return
     await supabase.from('custom_themes').delete().eq('school_id', schoolId)
 
@@ -550,23 +555,56 @@ export function useAppData(session) {
 
   const updateTimelineConfig = useCallback((newConfig) => {
     setTimelineConfig(newConfig)
-    if (initialLoadDone.current) saveTimelineToDb(newConfig, activeTemplateId)
+    if (initialLoadDone.current) {
+      setHasUnsavedChanges(true)
+      saveTimelineToDb(newConfig, activeTemplateId)
+    }
   }, [schoolId, activeTemplateId])
 
   const updateTemplates = useCallback((newTemplates) => {
     setTemplates(newTemplates)
-    if (initialLoadDone.current) saveTemplatesToDb(newTemplates)
-  }, [schoolId])
+    if (initialLoadDone.current) setHasUnsavedChanges(true)
+  }, [])
 
   const updateWeeklySchedule = useCallback((newSchedule) => {
     setWeeklySchedule(newSchedule)
-    if (initialLoadDone.current) saveWeeklyScheduleToDb(newSchedule)
-  }, [schoolId])
+    if (initialLoadDone.current) setHasUnsavedChanges(true)
+  }, [])
 
   const updateCustomThemes = useCallback((newThemes) => {
     setCustomThemes(newThemes)
     if (initialLoadDone.current) saveCustomThemesToDb(newThemes)
   }, [schoolId])
+
+  // --- Explicit save for templates, weekly schedule, and timeline ---
+  const saveAll = useCallback(async () => {
+    if (!schoolId) return
+    setIsSaving(true)
+    try {
+      await Promise.all([
+        saveTemplatesToDb(templates),
+        saveWeeklyScheduleToDb(weeklySchedule),
+        saveTimelineConfigToDb(timelineConfig, activeTemplateId),
+      ])
+      setHasUnsavedChanges(false)
+    } catch (err) {
+      console.error('Save failed:', err)
+      throw err
+    } finally {
+      setIsSaving(false)
+    }
+  }, [schoolId, templates, weeklySchedule, timelineConfig, activeTemplateId])
+
+  // --- Warn before closing tab with unsaved changes ---
+  useEffect(() => {
+    if (!hasUnsavedChanges) return
+    const handler = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [hasUnsavedChanges])
 
   // --- Auto-save changes back to source template ---
   useEffect(() => {
@@ -824,17 +862,10 @@ export function useAppData(session) {
     }
   }
 
-  const handleSignOut = async () => {
-    // Flush all pending debounced saves before clearing state
-    await Promise.all([
-      flushDisplaySettings(),
-      flushTimeline(),
-      flushTemplates(),
-      flushWeeklySchedule(),
-      flushCustomThemes(),
-    ])
+  const handleSignOut = () => {
     setSchoolId(null)
     setDataLoaded(false)
+    setHasUnsavedChanges(false)
     initialLoadDone.current = false
   }
 
@@ -857,6 +888,9 @@ export function useAppData(session) {
     setActiveTemplateId,
     todaysTemplateName,
     setTodaysTemplateName,
+    hasUnsavedChanges,
+    isSaving,
+    saveAll,
     updateDisplaySettings,
     updateCurrentTheme,
     updateTimelineConfig,
