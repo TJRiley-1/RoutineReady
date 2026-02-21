@@ -6,7 +6,8 @@
   <circle cx="100" cy="64" r="2.2" fill="#99F6E4"/>
   <circle cx="78" cy="42" r="2.2" fill="#99F6E4"/>
   <path d="M 88 42 L 97 51 L 114 34" stroke="#F59E0B" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <text x="100" y="113" font-family="system-ui, Helvetica, Arial, sans-serif" font-weight="300" font-size="24" fill="#374151" text-anchor="middle">Routine</text>
-  <text x="155" y="113" font-family="system-ui, Helvetica, Arial, sans-serif" font-weight="700" font-size="24" fill="#0D9488" text-anchor="middle">Ready</text>
+  <text x="100" y="113" font-family="system-ui, Helvetica, Arial, sans-serif" font-size="24" text-anchor="middle">
+    <tspan font-weight="300" fill="#374151">Routine </tspan><tspan font-weight="700" fill="#0D9488">Ready</tspan>
+  </text>
   <text x="100" y="135" font-family="system-ui, Helvetica, Arial, sans-serif" font-weight="500" font-size="11" fill="#6B7280" letter-spacing="3" text-anchor="middle">VISUAL SCHEDULES</text>
 </svg>
